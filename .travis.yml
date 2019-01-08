@@ -10,5 +10,9 @@ install:
 
 # Run tests
 script:
-  - pytest --cov==authors
+  - coverage run --source authors -m pytest
+  - python -m coverage report -m
 
+after_success:
+  # Run coveralls
+  - coveralls
