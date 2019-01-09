@@ -1,0 +1,34 @@
+{
+  "addons": [
+    "heroku-postgresql"
+  ],
+  "buildpacks": [
+
+  ],
+  "env": {
+    "DATABASE": {
+      "required": true
+    },
+    "DEBUG": {
+      "required": true
+    },
+    "DISABLE_COLLECTSTATIC": {
+      "required": true
+    },
+    "HOST": {
+      "required": true
+    },
+    "PASSWORD": {
+      "required": true
+    },
+    "USER": {
+      "required": true
+    }
+  },
+  "formation": {
+  },
+  "name": "ah-fulldeck",
+  "scripts": {
+  },
+  "stack": "heroku-18"
+}
