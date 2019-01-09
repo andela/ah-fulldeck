@@ -21,3 +21,7 @@ pytest==4.1.0
 pytest-cov==2.6.1
 wrapt==1.10.11
 coveralls==1.5.1
+flake8==3.6.0
+mccabe==0.6.1
+pycodestyle==2.4.0
+pyflakes==2.0.0
