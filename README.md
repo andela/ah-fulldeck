@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/andela/ah-fulldeck.svg?branch=ch-travisCI-integration-162948983)](https://travis-ci.org/andela/ah-fulldeck)
+
+
+
 Authors Haven - A Social platform for the creative at heart.
 =======
 

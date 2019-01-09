@@ -1,0 +1,14 @@
+language: python
+# Supported Python versions
+python:
+  - "3.5"
+  - "3.6"
+
+# Install dependencies
+install:
+  - pip install -r requirements.txt
+
+# Run tests
+script:
+  - pytest --cov==authors
+
