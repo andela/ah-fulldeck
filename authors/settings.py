@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_extensions',
     'rest_framework',
+    'rest_framework_swagger',
 
     'authors.apps.authentication',
     'authors.apps.core',
@@ -87,6 +88,21 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'fulldeck'
     }
+}
+
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False,
+    'enabled_methods': [
+        'get',
+        'post',
+        'put',
+        'delete',
+    ],
+    'SECURITY_DEFINITIONS': {
+        'api_key': {
+            'type': 'basic',
+        },
+    },
 }
 
 # Password validation
