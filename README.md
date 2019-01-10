@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/andela/ah-fulldeck.svg?branch=ch-travisCI-integration-162948983)](https://travis-ci.org/andela/ah-fulldeck)
+[![Build Status](https://travis-ci.org/andela/ah-fulldeck.svg?branch=ch-travisCI-integration-162948983)](https://travis-ci.org/andela/ah-fulldeck) [![Coverage Status](https://coveralls.io/repos/github/andela/ah-fulldeck/badge.svg?branch=ch-Coveralls-integration-162948986)](https://coveralls.io/github/andela/ah-fulldeck?branch=ch-Coveralls-integration-162948986)
 
 
 
