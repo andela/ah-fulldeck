@@ -85,10 +85,7 @@ WSGI_APPLICATION = 'authors.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ['DATABASE'],
-        'USER':os.environ['USER'],
-        'HOST':os.environ['HOST'],
-        'PASSWORD':os.environ['PASSWORD'],
+        'NAME': 'fulldeck'
     }
 }
 
