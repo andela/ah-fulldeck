@@ -10,6 +10,7 @@ install:
 services:
  - postgresql
 
+
 # Run tests
 before_script:
  - psql -c 'create database fulldeck;' -U postgres
@@ -18,8 +19,9 @@ before_script:
  - python manage.py migrate
 script:
  - coverage run --source=authors/apps manage.py test
+
  - python -m coverage report -m
 
-after_success:
  # Run coveralls
+after_success:
  - coveralls

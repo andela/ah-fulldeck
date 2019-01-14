@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate
 
 from rest_framework import serializers
-
+from rest_framework.validators import UniqueValidator
 from .models import User
 
 
@@ -10,10 +10,53 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     # Ensure passwords are at least 8 characters long, no longer than 128
     # characters, and can not be read by the client.
-    password = serializers.CharField(
-        max_length=128,
+    # serializers.RegexField - A text representation, that validates the given value matches against a certain regular expression.
+
+    password = serializers.RegexField(
+        regex=("^(?=.{8,}$)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*"),
         min_length=8,
-        write_only=True
+        max_length=30,
+        required=True,
+        write_only=True,
+        error_messages={
+            'required': 'Password is a required field',
+            'min_length': 'Password must be at least 8 characters long',
+            'max_length': 'Password cannot be more than 30 characters',
+            'invalid': 'Password must have at least a number, and a least an uppercase and a lowercase letter',
+        }
+    )
+
+    # Email must be valid and unique
+    email = serializers.EmailField(
+        required=True,
+        validators=[
+            UniqueValidator(
+                queryset=User.objects.all(),
+                message='Email is already in use by another user'
+            )
+        ],
+        error_messages={
+            'invalid': 'Email must be of the format name@domain.com',
+            'required': 'Email is a required field'
+        }
+    )
+    # The username must be unique
+    # There should not be any space in the username
+    # Underscores and hyphens are also allowed in the username
+
+    username = serializers.RegexField(
+        regex='^(?!.*\ )[A-Za-z\d\-\_]+$',
+        required=True,
+        validators=[
+            UniqueValidator(
+                queryset=User.objects.all(),
+                message='The username is already taken',
+            )
+        ],
+        error_messages={
+            'invalid': 'Username cannot contain a space or special character',
+            'required': 'Username is a required property',
+        }
     )
 
     # The client should not be able to send a token along with a registration
