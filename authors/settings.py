@@ -57,7 +57,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
+
 ]
 
 ROOT_URLCONF = 'authors.urls'
@@ -86,7 +86,10 @@ WSGI_APPLICATION = 'authors.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'fulldeck'
+        'NAME': os.environ['DATABASE'],
+        'USER': os.environ['USER'],
+        'HOST': os.environ['HOST'],
+        'PASSWORD': os.environ['PASSWORD'],
     }
 }
 
@@ -157,7 +160,7 @@ REST_FRAMEWORK = {
     'NON_FIELD_ERRORS_KEY': 'error',
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'authors.apps.authentication.backends.JWTAuthentication',
+        'authors.apps.authentication.backends.JWTAuthentication',
     ),
 }
 
