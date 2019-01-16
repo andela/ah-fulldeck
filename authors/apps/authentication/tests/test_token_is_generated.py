@@ -16,7 +16,7 @@ class JwtTestCase(TestBaseCase):
         """if user is registers successfully, a token is generated"""
         response = self.signup_user()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertIn('token', response.data)
+        self.assertIn('token', response.data['user_info'])
 
     def test_token_on_login(self):
         """Test if a user logs in successfully, a token is generated"""
