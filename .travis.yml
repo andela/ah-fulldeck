@@ -1,16 +1,24 @@
 language: python
 # Supported Python versions
 python:
-  - "3.5"
   - "3.6"
 
 # Install dependencies
 install:
   - pip install -r requirements.txt
+  - pip install coveralls
 
+
+services:
+  - postgresql
 # Run tests
+before_script:
+  - psql -c 'create database fulldeck;' -U postgres
+  - psql -c "ALTER USER postgres WITH PASSWORD 'fulldeck';" -U postgres
+  - python manage.py makemigrations
+  - python manage.py migrate
 script:
-  - coverage run --source authors -m pytest
+  - coverage run --source=authors/apps/authentication manage.py test
   - python -m coverage report -m
 
 after_success:

@@ -1,8 +1,8 @@
-import jwt # noqa
+import jwt  # noqa
 
-from datetime import datetime, timedelta # noqa
+from datetime import datetime, timedelta  # noqa
 
-from django.conf import settings # noqa
+from django.conf import settings  # noqa
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin
 )
@@ -117,3 +117,24 @@ class User(AbstractBaseUser, PermissionsMixin):
         the user's real name, we return their username instead.
         """
         return self.username
+
+    @property
+    def token(self):
+        """
+        Allows us to get a user's token by calling `user.token`
+        """
+        return self._generate_jwt_token()
+
+    def _generate_jwt_token(self):
+        """
+        Generates a JWT that stores this user's email and has an expiry
+        date set to 1 day into the future.
+        """
+        dt = datetime.now() + timedelta(days=1)
+        data = {
+            'email': self.email,
+            'exp': int(dt.strftime('%s'))
+        }
+        token = jwt.encode(data, settings.SECRET_KEY, algorithm='HS256')
+
+        return token.decode('utf-8')
