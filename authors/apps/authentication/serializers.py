@@ -5,7 +5,7 @@ from rest_framework.validators import UniqueValidator
 from .models import User
 
 
-class RegistrationSerializer(serializers.ModelSerializer):
+class PasswordSerializer(serializers.ModelSerializer):
     """Serializers registration requests and creates a new user."""
 
     # Ensure passwords are at least 8 characters long, no longer than 128
@@ -25,6 +25,20 @@ class RegistrationSerializer(serializers.ModelSerializer):
             'invalid': 'Password must have at least a number, and a least an uppercase and a lowercase letter',
         }
     )
+
+    confirm_password = serializers.CharField(
+        max_length=30,
+        min_length=8,
+        required=False
+    )
+
+
+class RegistrationSerializer(PasswordSerializer, serializers.ModelSerializer):
+    """Serializers registration requests and creates a new user."""
+
+    # Ensure passwords are at least 8 characters long, no longer than 128
+    # characters, and can not be read by the client.
+    # serializers.RegexField - A text representation, that validates the given value matches against a certain regular expression.
 
     # Email must be valid and unique
     email = serializers.EmailField(
@@ -62,6 +76,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     # The client should not be able to send a token along with a registration
     # request. Making `token` read-only handles that for us.
     token = serializers.CharField(max_length=255, read_only=True)
+
     class Meta:
         model = User
         # List all of the fields that could possibly be included in a request
@@ -71,6 +86,14 @@ class RegistrationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Use the `create_user` method we wrote earlier to create a new user.
         return User.objects.create_user(**validated_data)
+
+
+class PasswordResetSerializer(PasswordSerializer, serializers.ModelSerializer):
+    class Meta:
+        model = User
+        # List all of the fields that could possibly be included in a request
+        # or response, including fields specified explicitly above.
+        fields = ['password', 'confirm_password']
 
 
 class LoginSerializer(serializers.Serializer):
