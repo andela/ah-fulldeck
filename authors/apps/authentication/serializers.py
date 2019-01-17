@@ -62,7 +62,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
     # The client should not be able to send a token along with a registration
     # request. Making `token` read-only handles that for us.
     token = serializers.CharField(max_length=255, read_only=True)
-
     class Meta:
         model = User
         # List all of the fields that could possibly be included in a request
