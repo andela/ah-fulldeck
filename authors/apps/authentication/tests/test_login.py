@@ -27,4 +27,3 @@ class TestLogin(TestBaseCase):
     def test_unregistered_user_login(self):
         response = self.login_user()
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-

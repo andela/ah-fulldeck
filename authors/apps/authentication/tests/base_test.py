@@ -20,9 +20,10 @@ class TestBaseCase(APITestCase):
         self.no_username = ['username']
         self.no_password = ['password']
 
-    def remove_data(self, keys):
-        for key in keys:
-            del self.test_user['user'][key]
+    def remove_data(self, keys=None):
+        if keys:
+            for key in keys:
+                del self.test_user['user'][key]
         return self.test_user
 
     def signup_user(self):
