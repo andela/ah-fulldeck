@@ -1,4 +1,4 @@
-from rest_framework import status
+from rest_framework import status,generics
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -8,6 +8,13 @@ from .renderers import UserJSONRenderer
 from .serializers import (
     LoginSerializer, RegistrationSerializer, UserSerializer
 )
+
+
+class HomeView(generics.ListAPIView):
+    """class to access the home route"""
+
+    def get(self, request):
+        return Response("Welcome to fulldeck Authors Haven API")
 
 
 class RegistrationAPIView(APIView):

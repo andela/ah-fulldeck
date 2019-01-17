@@ -24,6 +24,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('api/v1/', include('authors.apps.authentication.urls',
-                            namespace='authentication')),
-    path('', include('authors.apps.base.urls')),
+                            namespace='app_authentication')),
+    path('', include('authors.apps.authentication.urls')),
 ]
