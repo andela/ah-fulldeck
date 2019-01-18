@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/andela/ah-fulldeck.svg?branch=ch-travisCI-integration-162948983)](https://travis-ci.org/andela/ah-fulldeck) [![Coverage Status](https://coveralls.io/repos/github/andela/ah-fulldeck/badge.svg?branch=ch-Coveralls-integration-162948986)](https://coveralls.io/github/andela/ah-fulldeck?branch=ch-Coveralls-integration-162948986)
+[![Build Status](https://travis-ci.org/andela/ah-fulldeck.svg?branch=ch-travisCI-integration-162948983)](https://travis-ci.org/andela/ah-fulldeck) 
+[![Coverage Status](https://coveralls.io/repos/github/andela/ah-fulldeck/badge.svg?branch=develop)](https://coveralls.io/github/andela/ah-fulldeck?branch=develop)
 
 
 
@@ -14,8 +15,75 @@ by leveraging the modern web.
 ## API Spec
 The preferred JSON object to be returned by the API should be structured as follows:
 
-### Users (for authentication)
+## Links to the Mockup Designs
+1. [Sign Up, Log In and Create Article](https://wireframepro.mockflow.com/view/M15c07edf891b45f0dfaa1f5cc85c68c61547577768098#/page/D31452032c99b79d208bf34f194933048)
+    
+2. [Homepage, Landing page and Profile](https://wireframepro.mockflow.com/view/M724c1af1281229c8914e2f1e3b9e2a201547621799851)
+   
 
+## Hosting
+Staging - https://ah-fulldeck-staging.herokuapp.com/
+
+## API Documentation
+https://ah-fulldeck-staging.herokuapp.com/api/v1/docs
+
+## How to setup and test the application
+1. Install pip first using this command 
+
+    `sudo apt-get install python3-pip`
+
+1. Install virtualenv using pip3 `sudo pip3 install virtualenv `
+
+1. Create a virtual environment `virtualenv venv `
+
+1. Activate your virtual environment: `source venv/bin/activate`
+
+1. Clone this repo with the following command:
+
+    `git clone https://github.com/andela/ah-fulldeck.git`
+
+1. Cd into the ah-fulldeck directory:
+`cd ah-fulldeck`
+
+1. Install the requirements by running the command:
+
+      `pip install -r requirements.txt`
+
+1. Create a database:
+  In the terminal run the following after installing postgres and setting up:  
+  
+    `psql`
+  `create DATABASE <name_of_your_database>`
+1. Create a .env file in the project folder and and the following exports:  
+   
+   `export DATABASE="<name of your database>"`  
+   
+   `export USER="<your postgres username>"`  
+   
+   `export HOST="<localhost>"`
+   
+   `export PASSWORD="<your postgres password>"`
+   
+   `export EMAIL_SENDER="ahfulldeck@gmail.com"`
+
+   `export EMAIL_HOST="smtp.gmail.com"`
+
+   `export EMAIL_HOST_USER="ahfulldeck"`
+
+   `export EMAIL_HOST_PASSWORD="Ful!deck1234"`
+
+   `export EMAIL_PORT=587`
+
+1. Export the settings by running the command: `source .env`
+
+1. Migrate the database:
+ 
+    `python manage.py migrate`
+1. Run the server:
+    
+    `python manage.py runserver`
+
+### Users (for authentication)
 ```source-json
 {
   "user": {
