@@ -10,7 +10,9 @@ class PasswordSerializer(serializers.ModelSerializer):
 
     # Ensure passwords are at least 8 characters long, no longer than 128
     # characters, and can not be read by the client.
-    # serializers.RegexField - A text representation, that validates the given value matches against a certain regular expression.
+    # serializers.RegexField - A text representation, 
+    # that validates the given value matches 
+    # against a certain regular expression.
 
     password = serializers.RegexField(
         regex=("^(?=.{8,}$)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*"),
@@ -38,7 +40,9 @@ class RegistrationSerializer(PasswordSerializer, serializers.ModelSerializer):
 
     # Ensure passwords are at least 8 characters long, no longer than 128
     # characters, and can not be read by the client.
-    # serializers.RegexField - A text representation, that validates the given value matches against a certain regular expression.
+    # serializers.RegexField - A text representation, 
+    # that validates the given value matches 
+    # against a certain regular expression.
 
     # Email must be valid and unique
     email = serializers.EmailField(
@@ -209,3 +213,12 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class SocialAuthSerializer(serializers.Serializer):
+    """ Accepts provider, acces token , and access_token_secret"""
+    provider = serializers.CharField(max_length=255, required=True)
+    access_token = serializers.CharField(
+        max_length=4096, required=True, trim_whitespace=True)
+    access_token_secret = serializers.CharField(
+        max_length=4096, required=False, trim_whitespace=True)

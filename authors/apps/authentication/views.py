@@ -12,9 +12,11 @@ from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
 from .renderers import UserJSONRenderer
 from .serializers import (
-    LoginSerializer, RegistrationSerializer, UserSerializer, 
-    PasswordResetSerializer
-)
+    LoginSerializer, RegistrationSerializer, UserSerializer,
+    SocialAuthSerializer, PasswordResetSerializer)
+from social_django.utils import load_strategy, load_backend
+from social_core.exceptions import MissingBackend
+from social_core.backends.oauth import BaseOAuth1, BaseOAuth2
 from authors.settings import SECRET_KEY
 from .send_email import send_email
 from .models import User
@@ -35,10 +37,6 @@ class RegistrationAPIView(CreateAPIView):
 
     def post(self, request):
         user = request.data.get('user', {})
-
-        # The create serializer, validate serializer, save serializer pattern
-        # below is common and you will see it a lot throughout this course and
-        # your own work later on. Get familiar with it.
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -47,6 +45,8 @@ class RegistrationAPIView(CreateAPIView):
         username = serializer.data['username']
         token = serializer.data['token']
         sender = os.getenv('EMAIL_SENDER')
+
+        sender = "ahfulldeck@gmail.com"
         current_site = get_current_site(request)
         verification_link = "http://" + current_site.domain + \
             '/api/v1/verify/{}'.format(token)
@@ -94,11 +94,6 @@ class LoginAPIView(CreateAPIView):
 
     def post(self, request):
         user = request.data.get('user', {})
-
-        # Notice here that we do not call `serializer.save()` like we did for
-        # the registration endpoint. This is because we don't actually have
-        # anything to save. Instead, the `validate` method on our serializer
-        # handles everything we need.
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
 
@@ -111,18 +106,12 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
     serializer_class = UserSerializer
 
     def retrieve(self, request, *args, **kwargs):
-        # There is nothing to validate or save here. Instead, we just want the
-        # serializer to handle turning our `User` object into something that
-        # can be JSONified and sent to the client.
         serializer = self.serializer_class(request.user)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
         serializer_data = request.data.get('user', {})
-
-        # Here is that serialize, validate, save pattern we talked about
-        # before.
         serializer = self.serializer_class(
             request.user, data=serializer_data, partial=True
         )
@@ -136,14 +125,14 @@ class PasswordResetAPIView(generics.CreateAPIView):
     permission_classes = (AllowAny,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = PasswordResetSerializer
-  
+
     def post(self, request):
         recipient = request.data.get('email', {})  # user enters email
         if not recipient:
             return Response({"message": "Enter your email"}, status=status.HTTP_400_BAD_REQUEST)
         # generate a new token for each email entered
         token = jwt.encode({"email": recipient},
-                           settings.SECRET_KEY, algorithm='HS256')       
+                           settings.SECRET_KEY, algorithm='HS256')
         # confirm user exists
         user_exists = User.objects.filter(email=recipient).exists()
         if user_exists:
@@ -171,7 +160,7 @@ class PasswordUpdateAPIView(generics.UpdateAPIView):
         }
         serializer = self.serializer_class(data=password)
         serializer.is_valid(raise_exception=True)
-    
+
         try:
             decode_token = jwt.decode(
                 token, settings.SECRET_KEY, algorithms=['HS256'])
@@ -182,3 +171,64 @@ class PasswordUpdateAPIView(generics.UpdateAPIView):
             return Response(result, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({'message': e}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SocialAuthView(CreateAPIView):
+    """Login via social sites (Google, Twitter, Facebook)"""
+    permission_classes = (AllowAny,)
+    serializer_class = SocialAuthSerializer
+    renderer_classes = (UserJSONRenderer,)
+
+    def create(self, request):
+        """Takes in provider and access_token to authenticate user"""
+        serializer = self.serializer_class(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        provider = serializer.data.get("provider")
+        authenticated_user = request.user if not request.user.is_anonymous else None
+        strategy = load_strategy(request)
+
+        # Load backend associated with the provider
+        try:
+            
+            backend = load_backend(
+                strategy=strategy, name=provider, redirect_uri=None)
+            if isinstance(backend, BaseOAuth1):
+                if "access_token_secret" in request.data:
+                    access_token={
+                        'oauth_token': request.data['access_token'],
+                        'oauth_token_secret': request.data['access_token_secret']
+                    }
+                else:
+                    return Response(
+                        {"error": "Access token secret is required"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+            elif isinstance(backend, BaseOAuth2):
+                
+                access_token = serializer.data.get("access_token")
+
+        except MissingBackend:
+            return Response({"error": "The Provider is invalid"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        # Go through the pipeline to create user if they don't exist
+        try:
+            user = backend.do_auth(access_token, user=authenticated_user)
+        
+        except BaseException:
+            return Response({"error": "Invalid token"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if user and user.is_active:
+
+            email = user.email
+            username = user.username
+            token = user.token
+            user_data = {
+                "username": username,
+                "email": email,
+                "token": token
+            }
+            return Response(user_data, status=status.HTTP_200_OK)
