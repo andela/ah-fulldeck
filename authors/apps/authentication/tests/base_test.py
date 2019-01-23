@@ -21,16 +21,16 @@ class TestBaseCase(APITestCase):
 
         email = 'test@user.com'
         token = jwt.encode({"email": "test@user.com"},
-                        settings.SECRET_KEY, algorithm='HS256').decode()
+                           settings.SECRET_KEY, algorithm='HS256').decode()
         self.password_update_url = reverse(
             'authentication:password_update', kwargs={'token': token})
-            
+
         self.no_email = ['email']
         self.no_username = ['username']
         self.no_password = ['password']
         self.passwords = {
-            'password':'Nicanor12nic',
-            'confirm_password':'Nicanor12nic'
+            'password': 'Nicanor12nic',
+            'confirm_password': 'Nicanor12nic'
         }
 
     def remove_data(self, keys=None):
@@ -49,4 +49,3 @@ class TestBaseCase(APITestCase):
         return self.client.post(self.login_url,
                                 self.test_user,
                                 format='json')
-    

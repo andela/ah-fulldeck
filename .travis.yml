@@ -12,11 +12,12 @@ services:
 
 # Run tests
 before_script:
+  - python manage.py collectstatic
   - psql -c 'create database fulldeck;' -U postgres
   - psql -c "ALTER USER postgres WITH PASSWORD 'fulldeck';" -U postgres
   - python manage.py makemigrations
   - python manage.py migrate
-script:
+script: 
  - coverage run --source=authors/apps manage.py test
 
  - python -m coverage report -m
