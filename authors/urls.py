@@ -22,12 +22,13 @@ schema_view = get_swagger_view(title='Authors Haven API')
 urlpatterns = [
     path('api/v1/docs', schema_view),
     path('admin/', admin.site.urls),
+
     path('api/v1/', include('authors.apps.authentication.urls',
                             namespace='app_authentication')),
     path('', include('authors.apps.authentication.urls')),
-    path('api/v1/', include('authors.apps.profiles.urls', namespace='profiles')),
+    path('api/v1/', include('authors.apps.profiles.urls',
+                            namespace='profiles')),
     path('api/v1/', include(('authors.apps.articles.urls',
-                            'articles'), namespace='articles')),
+                             'articles'), namespace='articles')),
 
 ]
-
