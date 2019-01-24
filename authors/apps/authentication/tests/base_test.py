@@ -25,6 +25,13 @@ class TestBaseCase(APITestCase):
         self.password_update_url = reverse(
             'authentication:password_update', kwargs={'token': token})
 
+        self.user_profile = {
+            'profile': {
+                'bio': 'see me see you',
+                'image': 'https://static.productionready.io/images/smiley-cyrus.jpg'
+            }
+        }
+        self.username = self.test_user['user']['username']
         self.no_email = ['email']
         self.no_username = ['username']
         self.no_password = ['password']
@@ -49,3 +56,11 @@ class TestBaseCase(APITestCase):
         return self.client.post(self.login_url,
                                 self.test_user,
                                 format='json')
+
+    def token(self):
+        self.signup_user()
+        return self.login_user().data['token']
+
+    def get_profile_url(self, username):
+        return reverse('profiles:user_profile', args={username})
+
