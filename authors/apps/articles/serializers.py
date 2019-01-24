@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Article, Comment
+from .models import Article, Comment, LikeDislike
 from authors.apps.profiles.serializers import ProfileSerializer
 from authors.apps.profiles.models import Profile
 
@@ -99,3 +99,9 @@ class CommentsSerializers(serializers.ModelSerializer):
         model = Comment
         fields = ('id', 'body', 'created_at', 'updated_at',
                   'author', 'article', 'parent')
+class LikeDislikeSerializer(serializers.Serializer):
+    """
+    serializer class for the Like Dislike model
+    """
+    class Meta:
+        model = LikeDislike
