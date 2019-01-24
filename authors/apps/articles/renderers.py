@@ -14,7 +14,6 @@ class ArticleJsonRenderer(renderers.BaseRenderer):
         # checks if the data received is a list
         # Used to display the articles
         if isinstance(data, list):
-            # converts it into a dictionary with a key
             return json.dumps(
                 {'articles': data})
         else:
@@ -24,3 +23,22 @@ class ArticleJsonRenderer(renderers.BaseRenderer):
                 return json.dumps({'message': data})
             # if not an error then it must be a single article dictionary
             return json.dumps({'article': data})
+
+
+class RatingJSONRenderer(renderers.JSONRenderer):
+    charset = 'utf-8'
+
+    media_type = 'application/json'
+    format = 'json'
+    
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        if isinstance(data, dict):
+            return json.dumps(
+                {'ratings': data})
+        else:
+            # checks if the data received is an error message
+            error = data.get('detail')
+            if error:
+                return json.dumps({'message': data})
+            # if not an error then it must be a single article dictionary
+            return json.dumps({'rating': data})

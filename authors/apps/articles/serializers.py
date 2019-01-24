@@ -1,6 +1,9 @@
 from rest_framework import serializers
 
-from .models import Article, Comment, LikeDislike
+from .models import Article, Comment, LikeDislike, ArticleRatings
+from django.db.models import Avg
+from collections import Counter
+from rest_framework.validators import UniqueValidator
 from authors.apps.profiles.serializers import ProfileSerializer
 from authors.apps.profiles.models import Profile
 
@@ -30,7 +33,8 @@ class ArticleSerializers(serializers.ModelSerializer):
             'required': 'Body cannot be empty'
         }
     )
-
+    avg_rating = serializers.SerializerMethodField(
+        method_name='average_rating')
     author = serializers.SerializerMethodField(read_only=True)
 
     slug = serializers.CharField(read_only=True)
@@ -48,11 +52,27 @@ class ArticleSerializers(serializers.ModelSerializer):
             'description',
             'body',
             'slug',
+            'avg_rating',
             'image_url',
             'author',
             'created_at',
             'updated_at'
         )
+
+    def average_rating(self, instance):
+        avg_rating = ArticleRatings.objects.filter(article=instance).aggregate(
+            average_rating=Avg('rating'))['average_rating'] or 0
+        avg_rating = round(avg_rating)
+        total_user_rates = ArticleRatings.objects.filter(
+            article=instance).count()
+        each_rating = Counter(ArticleRatings.objects.filter(
+            article=instance).values_list('rating', flat=True))
+
+        return {
+            'avg_rating': avg_rating,
+            'total_user_rates': total_user_rates,
+            'each_rating': each_rating
+        }
 
 
 class CommentsSerializers(serializers.ModelSerializer):
@@ -63,6 +83,11 @@ class CommentsSerializers(serializers.ModelSerializer):
             'required': 'Comments field cannot be blank'
         }
     )
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'body', 'created_at', 'updated_at',
+                  'author', 'article', 'parent')
 
     def format_date(self, date):
         return date.strftime('%d %b %Y %H:%M:%S')
@@ -95,13 +120,39 @@ class CommentsSerializers(serializers.ModelSerializer):
 
         return representation
 
+
+class RatingSerializer(serializers.ModelSerializer):
+    """
+    create and update existing ratings for our articles
+    """
+    rating = serializers.IntegerField(required=True)
+
     class Meta:
-        model = Comment
-        fields = ('id', 'body', 'created_at', 'updated_at',
-                  'author', 'article', 'parent')
+        model = ArticleRatings
+        fields = ['rating', 'rated_by']
+        read_only_fields = ['rated_by']
+        
+
 class LikeDislikeSerializer(serializers.Serializer):
     """
     serializer class for the Like Dislike model
     """
     class Meta:
         model = LikeDislike
+
+    def create(self, validated_data):
+        rating = ArticleRatings.objects.create(**validated_data)
+
+        return rating
+
+    def validate(self, data):
+        """
+        ensure the ratings are between 1 and 5
+        """
+        rating = data.get('rating')
+
+        if rating:
+            if rating < 1 or rating > 5:
+                raise serializers.ValidationError(
+                    "Rating should be a number between 1 and 5")
+        return {'rating': rating}

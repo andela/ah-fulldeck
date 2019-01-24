@@ -30,5 +30,4 @@ urlpatterns = [
                             namespace='profiles')),
     path('api/v1/', include(('authors.apps.articles.urls',
                              'articles'), namespace='articles')),
-
 ]
