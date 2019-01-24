@@ -29,6 +29,22 @@ class Migration(migrations.Migration):
             ],
             options={
                 'ordering': ['-created_at'],
+
+            },
+        ),
+        migrations.CreateModel(
+            name='Comment',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('body', models.CharField(max_length=200)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('article', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='articles.Article')),
+                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to=settings.AUTH_USER_MODEL)),
+                ('parent', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='threads', to='articles.Comment')),
+            ],
+            options={
+                'ordering': ('-created_at',),
             },
         ),
     ]

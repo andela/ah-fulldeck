@@ -7,6 +7,7 @@ class TestBaseCase(APITestCase):
         self.signup_url = reverse('app_authentication:signup')
         self.login_url = reverse('app_authentication:login')
         self.create_list_article_url = reverse('articles:articles')
+
         self.test_user = {
             'user': {
                 'username': 'testuser',
@@ -24,7 +25,13 @@ class TestBaseCase(APITestCase):
         self.no_email = ['email']
         self.no_username = ['username']
         self.no_password = ['password']
-    
+
+        self.comment = {
+            "comment": {
+                "body": "This is a test comment body."
+            }
+        }
+
     def remove_data(self, keys=None):
         if keys:
             for key in keys:
@@ -59,4 +66,29 @@ class TestBaseCase(APITestCase):
 
     def single_article_url(self, slug):
         url = reverse('articles:article-details', args=[slug])
+        return url
+
+    def single_article_details(self):
+        slug = self.create_article()
+        url = reverse('articles:article-details', {slug: 'slug'})
+        return url
+
+    def create_comment(self, slug):
+        url = reverse("articles:comments", kwargs={"slug": slug})
+        return url
+
+    def add_comment(self, slug):
+        url = self.create_comment(slug)
+        token = self.login_user()
+        response = self.client.post(
+            url,
+            self.comment,
+            format="json",
+            HTTP_AUTHORIZATION="Token " + token
+        )
+        return response
+
+    def specific_comment(self, slug, id):
+        url = reverse('articles:comment-details',
+                      kwargs={"slug": slug, "id": id})
         return url
