@@ -92,3 +92,11 @@ class TestBaseCase(APITestCase):
         url = reverse('articles:comment-details',
                       kwargs={"slug": slug, "id": id})
         return url
+        
+    def like_arcticle_url(self, slug):
+        url = reverse('articles:article_like', args=[slug])
+        return url
+
+    def dislike_article_url(self, slug):
+        url = reverse('articles:article_dislike', args=[slug])
+        return url

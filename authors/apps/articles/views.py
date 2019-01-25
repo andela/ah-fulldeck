@@ -1,13 +1,14 @@
 from rest_framework.generics import (
-    ListCreateAPIView, RetrieveUpdateDestroyAPIView)
+    ListCreateAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView)
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
+from django.contrib.contenttypes.models import ContentType
 
 
-from .models import Article, Comment
-from .serializers import ArticleSerializers, CommentsSerializers
+from .models import Article, Comment, LikeDislike
+from .serializers import ArticleSerializers, CommentsSerializers, LikeDislikeSerializer
 from .renderers import ArticleJsonRenderer
 from .permissions import IsOwnerOrReadonly
 
@@ -122,7 +123,7 @@ class CommentView(ListCreateAPIView):
 
 
 class CommentDetails(RetrieveUpdateDestroyAPIView,
-                                    ListCreateAPIView):
+                     ListCreateAPIView):
     """
     Class for retrieving, updating and deleting a comment
     """
@@ -199,3 +200,50 @@ class CommentDetails(RetrieveUpdateDestroyAPIView,
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+
+class LikeDislikeView(CreateAPIView):
+    """
+    this class defines the endpoint for like and dislike
+    """
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    serializer_class = LikeDislikeSerializer
+    model = None    # Data Model - Articles or Comments
+    vote_type = None  # Vote type Like/Dislike
+
+    def post(self, request, slug):
+        """
+        This view enables a user to like or dislike an article
+        """
+        # check an article is existing
+        article = get_article(slug)
+
+        try:
+            # if user has ever voted
+            like_dislike = LikeDislike.objects.get(
+                content_type=ContentType.objects.get_for_model(article),
+                object_id=article.id,
+                user=request.user)
+            # check if the user has liked or disliked the article or comment already
+            if like_dislike.vote is not self.vote_type:
+                like_dislike.vote = self.vote_type
+                like_dislike.save(update_fields=['vote'])
+                result = True
+            else:
+                # delete the existing record if the user is submitting a similar vote
+                like_dislike.delete()
+                result = False
+        except LikeDislike.DoesNotExist:
+            # user has never voted for the article, create new record.
+            article.votes.create(user=request.user, vote=self.vote_type)
+            result = True
+
+        return Response({
+            "status": result,
+            "likes": article.votes.likes().count(),
+            "dislikes": article.votes.dislikes().count(),
+            "Total": article.votes.sum_rating()
+        },
+            content_type="application/json",
+            status=status.HTTP_201_CREATED
+        )

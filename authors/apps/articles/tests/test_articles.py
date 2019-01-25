@@ -74,6 +74,20 @@ class TestArticle(TestBaseCase):
         message = "Title is required"
         self.base_articles(message, response)
 
+    def test_get_an_article_that_does_not_exist(self):
+        """
+        This method checks that one cannot get an article
+        that does not exist
+        """
+        response = self.authorized_post_request(self.create_list_article_url)
+        slug = response.data['slug'] + "no-such-article"
+        url = self.single_article_url(slug)
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        message = "No article found for the slug given"
+        self.base_articles(message, response)
+
+
     def test_user_can_update(self):
         """
         This method checks if a user can update an existing articles
