@@ -7,11 +7,16 @@ class TestBaseCase(APITestCase):
         self.signup_url = reverse('app_authentication:signup')
         self.login_url = reverse('app_authentication:login')
         self.create_list_article_url = reverse('articles:articles')
-
         self.test_user = {
             'user': {
                 'username': 'testuser',
                 'email': 'test@user.com',
+                'password': 'TestUser123'
+            }}
+        self.test_user2 = {
+            'user': {
+                'username': 'testuser2',
+                'email': 'test2@user.com',
                 'password': 'TestUser123'
             }}
         self.article = {
@@ -20,6 +25,16 @@ class TestBaseCase(APITestCase):
                 "description": "Test description for the article",
                 "body": "Test body for the article",
                 "author": 1
+            }
+        }
+        self.rating = {
+            "rating": {
+                "rating": 5
+            }
+        }
+        self.bad_Rating = {
+            "rating": {
+                "rating": 7
             }
         }
         self.no_email = ['email']
@@ -43,6 +58,11 @@ class TestBaseCase(APITestCase):
                                 self.test_user,
                                 format='json')
 
+    def signup_user2(self):
+        return self.client.post(self.signup_url,
+                                self.test_user2,
+                                format='json')
+
     def login_user(self):
         self.signup_user()
         try:
@@ -51,6 +71,14 @@ class TestBaseCase(APITestCase):
             pass
         response = self.client.post(self.login_url,
                                     self.test_user,
+                                    format='json')
+        token = response.data['token']
+        return token
+
+    def login_user2(self):
+        self.signup_user2()
+        response = self.client.post(self.login_url,
+                                    self.test_user2,
                                     format='json')
         token = response.data['token']
         return token
@@ -99,4 +127,11 @@ class TestBaseCase(APITestCase):
 
     def dislike_article_url(self, slug):
         url = reverse('articles:article_dislike', args=[slug])
+
+    def rating_url(self, slug):
+        url = reverse('articles:rate-articles', args=[slug])
+        return url
+
+    def ratings_url(self, slug):
+        url = reverse('articles:article-ratings', args=[slug])
         return url

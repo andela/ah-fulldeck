@@ -20,5 +20,9 @@ urlpatterns = [
     path('articles/<slug>/dislike/',
          views.LikeDislikeView.as_view(
              model=Article, vote_type=LikeDislike.DISLIKE),
-         name='article_dislike')
+         name='article_dislike'),
+    path('articles/<slug>/rate/', views.RatingView.as_view(),
+         name='rate-articles'),
+    path('articles/<slug>/ratings/',
+         views.RatingDetails.as_view(), name='article-ratings')
 ]
