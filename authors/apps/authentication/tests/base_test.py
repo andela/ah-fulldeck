@@ -53,6 +53,13 @@ class TestBaseCase(APITestCase):
                 'email': 'test@user.com',
                 'password': 'TestUser123'
             }}
+        self.test_user_2 = {
+            "user": {
+                'username': 'TestUser2',
+                'email': 'testuser2@email.com',
+                'password': 'TestUser2@123',
+            }
+        }
 
         email = 'test@user.com'
         token = jwt.encode({"email": "test@user.com"},
@@ -98,4 +105,3 @@ class TestBaseCase(APITestCase):
 
     def get_profile_url(self, username):
         return reverse('profiles:user_profile', args={username})
-
