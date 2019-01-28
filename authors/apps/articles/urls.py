@@ -33,5 +33,9 @@ urlpatterns = [
          views.LikeDislikeView.as_view(model=Comment,
                                        vote_type=LikeDislike.DISLIKE),
          name="comment_dislike"),
-    path('tags/', views.TagsView.as_view(), name="articles-tags")
+    path('tags/', views.TagsView.as_view(), name="articles-tags"),
+    path('articles/<slug>/favorite/',
+         views.FavouriteArticleView.as_view(), name="article-favorite"),
+    path('favorites/', views.GetUserFavorites.as_view(),
+         name='all_favourites')
 ]

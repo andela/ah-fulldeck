@@ -1,9 +1,10 @@
 from django.urls import reverse
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase,APIClient
 
 
 class TestBaseCase(APITestCase):
     def setUp(self):
+        self.client=APIClient()
         self.signup_url = reverse('app_authentication:signup')
         self.login_url = reverse('app_authentication:login')
         self.create_list_article_url = reverse('articles:articles')
@@ -150,3 +151,15 @@ class TestBaseCase(APITestCase):
     def like_comment_url(self, id):
         url = reverse('articles:comments_like', kwargs={'id': id})
         return url
+
+    def favorite_article_url(self, slug):
+        url = reverse('articles:article-favorite', args=[slug])
+        return url
+
+    def my_favorites_url(self):
+        url = reverse('articles:all_favourites')
+        return url
+    
+    def authorize(self):
+        token = self.login_user2()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token)
