@@ -51,7 +51,7 @@ class CommentsTests(TestBaseCase):
         token = self.login_user()
         slug = self.create_article()
         response = self.client.get(self.create_comment(slug),
-            HTTP_AUTHORIZATION="Token " + token)
+                                   HTTP_AUTHORIZATION="Token " + token)
         self.ok_200(response)
 
     def test_can_view_single_comment(self):

@@ -63,5 +63,5 @@ class TestLikeDislike(TestBaseCase):
         slug = slug_response.data['slug'] + "test-artle"
         url = self.like_arcticle_url(slug)
         response = self.base_like_dislike_article(token, url)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn(b'No article found for the slug given', response.content)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn(b'Not found', response.content)

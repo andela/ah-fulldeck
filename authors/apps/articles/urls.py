@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .models import Article, LikeDislike
+from .models import Article, LikeDislike, Comment
 from . import views
 
 app_name = "articles"
@@ -24,5 +24,13 @@ urlpatterns = [
     path('articles/<slug>/rate/', views.RatingView.as_view(),
          name='rate-articles'),
     path('articles/<slug>/ratings/',
-         views.RatingDetails.as_view(), name='article-ratings')
+         views.RatingDetails.as_view(), name='article-ratings'),
+    path('comments/<int:id>/like/',
+         views.LikeDislikeView.as_view(model=Comment,
+                                       vote_type=LikeDislike.LIKE),
+         name="comment_like"),
+    path('comments/<int:id>/dislike/',
+         views.LikeDislikeView.as_view(model=Comment,
+                                       vote_type=LikeDislike.DISLIKE),
+         name="comment_dislike"),
 ]

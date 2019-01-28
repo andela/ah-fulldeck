@@ -3,7 +3,8 @@ from django.utils.text import slugify
 from django.db.models import Sum
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
+from django.contrib.contenttypes.fields import (GenericRelation,
+                                                GenericForeignKey)
 
 from authors.apps.authentication.models import User
 
@@ -38,10 +39,16 @@ class LikeDislikeManager(models.Manager):
         """
         return self.get_queryset().filter(content_type__model='article').order_by('-articles__published_at')
 
+    def comments(self):
+        """
+        obtain the votes of a particular user to comments
+        """
+        return self.get_queryset().filter(content_type__model='comment').order_by('-comments__createdAt')
+
 
 class LikeDislike(models.Model):
     """
-    Users should be able to like and/or dislike an article or comment.
+    Users should be able to like and/or dislike an article or a specific comment.
     This class creates the fields for like/dislike
     """
     LIKE = 1
@@ -127,6 +134,7 @@ class Comment(models.Model):
         related_name='threads',
         on_delete=models.CASCADE
     )
+    votes = GenericRelation(LikeDislike, related_query_name='comment')
 
     def __str__(self):
         return self.body

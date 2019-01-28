@@ -67,7 +67,7 @@ class TestBaseCase(APITestCase):
         self.signup_user()
         try:
             self.remove_data(self.no_username)
-        except:
+        except Exception:
             pass
         response = self.client.post(self.login_url,
                                     self.test_user,
@@ -116,17 +116,22 @@ class TestBaseCase(APITestCase):
         )
         return response
 
+    def get_comment(self, id):
+        url = reverse('articles:comment-details',
+                      kwargs={"id": id})
+        return url
+
     def specific_comment(self, slug, id):
         url = reverse('articles:comment-details',
                       kwargs={"slug": slug, "id": id})
         return url
-        
+
     def like_arcticle_url(self, slug):
         url = reverse('articles:article_like', args=[slug])
         return url
 
     def dislike_article_url(self, slug):
-        url = reverse('articles:article_dislike', args=[slug])
+        return reverse('articles:article_dislike', args=[slug])
 
     def rating_url(self, slug):
         url = reverse('articles:rate-articles', args=[slug])
@@ -134,4 +139,8 @@ class TestBaseCase(APITestCase):
 
     def ratings_url(self, slug):
         url = reverse('articles:article-ratings', args=[slug])
+        return url
+
+    def like_comment_url(self, id):
+        url = reverse('articles:comments_like', kwargs={'id': id})
         return url
