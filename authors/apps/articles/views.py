@@ -1,37 +1,28 @@
-from .serializers import (ArticleSerializers, CommentsSerializers,
-                          LikeDislikeSerializer, RatingSerializer)
-from .permissions import IsOwnerOrReadonly
-from django.db.models import Avg
-from collections import Counter
-from .renderers import ArticleJsonRenderer, RatingJSONRenderer
-from .serializers import ArticleSerializers, CommentsSerializers, LikeDislikeSerializer, RatingSerializer, FavoriteArticlesSerializer
-from .models import Article, Comment, LikeDislike, ArticleRatings, FavoriteArticle
-from .models import Article, Comment, LikeDislike, ArticleRatings
-from django.shortcuts import get_object_or_404
-from rest_framework.permissions import (IsAuthenticatedOrReadOnly,
-                                        IsAuthenticated)
-
 from rest_framework.generics import (ListCreateAPIView,
                                      RetrieveUpdateDestroyAPIView,
                                      CreateAPIView,
                                      RetrieveAPIView,
                                      ListAPIView)
+from rest_framework.pagination import PageNumberPagination
+
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from .permissions import IsOwnerOrReadonly
+
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
 
-
-from .models import Article, Comment, LikeDislike, ArticleRatings, Tag
+from .models import Article, Comment, LikeDislike, ArticleRatings, Tag, FavoriteArticle
 from .serializers import (ArticleSerializers,
                           CommentsSerializers,
                           LikeDislikeSerializer,
                           RatingSerializer,
+                          FavoriteArticlesSerializer,
                           TagSerializer)
-from .renderers import ArticleJsonRenderer, RatingJSONRenderer
-from .permissions import IsOwnerOrReadonly
 
+from .renderers import ArticleJsonRenderer, RatingJSONRenderer
 from collections import Counter
 from django.db.models import Avg
 from rest_framework.views import APIView
@@ -50,11 +41,24 @@ def get_article(slug):
         article_not_found()
 
 
+class StandardPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
 class ListCreateArticle(ListCreateAPIView):
+    pagination_class = StandardPagination
     queryset = Article.objects.all()
     renderer_classes = (ArticleJsonRenderer,)
     serializer_class = ArticleSerializers
     permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get(self, request):
+        paginator = StandardPagination()
+        result_page = paginator.paginate_queryset(self.queryset, request)
+        serializer = ArticleSerializers(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
         article = request.data.get('article', {})
@@ -232,7 +236,7 @@ class LikeDislikeView(CreateAPIView):
     """
     permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = LikeDislikeSerializer
-    model = None    # Data Model - Articles or Comments
+    model = None  # Data Model - Articles or Comments
     vote_type = None  # Vote type Like/Dislike
 
     def post(self, request, slug=None, id=None):
@@ -321,11 +325,9 @@ class RatingDetails(RetrieveAPIView):
     lookup_field = 'slug'
 
     def get(self, request, slug):
-
         article = get_article(slug)
 
         if article is not None:
-
             avg_rating = ArticleRatings.objects.filter(article=article).aggregate(
                 average_rating=Avg('rating'))['average_rating'] or 0
             avg_rating = round(avg_rating)
@@ -393,4 +395,4 @@ class GetUserFavorites(APIView):
             serializer = FavoriteArticlesSerializer(fav_article, many=True)
             return Response(serializer.data, status.HTTP_200_OK)
         else:
-            return Response({'message':'No favorites available'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'message': 'No favorites available'}, status=status.HTTP_404_NOT_FOUND)

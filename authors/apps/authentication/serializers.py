@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate
 
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from .models import User 
+from .models import User
 
 
 class PasswordSerializer(serializers.ModelSerializer):
@@ -10,8 +10,8 @@ class PasswordSerializer(serializers.ModelSerializer):
 
     # Ensure passwords are at least 8 characters long, no longer than 128
     # characters, and can not be read by the client.
-    # serializers.RegexField - A text representation, 
-    # that validates the given value matches 
+    # serializers.RegexField - A text representation,
+    # that validates the given value matches
     # against a certain regular expression.
 
     password = serializers.RegexField(
@@ -40,8 +40,8 @@ class RegistrationSerializer(PasswordSerializer, serializers.ModelSerializer):
 
     # Ensure passwords are at least 8 characters long, no longer than 128
     # characters, and can not be read by the client.
-    # serializers.RegexField - A text representation, 
-    # that validates the given value matches 
+    # serializers.RegexField - A text representation,
+    # that validates the given value matches
     # against a certain regular expression.
 
     # Email must be valid and unique
@@ -90,14 +90,6 @@ class RegistrationSerializer(PasswordSerializer, serializers.ModelSerializer):
     def create(self, validated_data):
         # Use the `create_user` method we wrote earlier to create a new user.
         return User.objects.create_user(**validated_data)
-
-
-class PasswordResetSerializer(PasswordSerializer, serializers.ModelSerializer):
-    class Meta:
-        model = User
-        # List all of the fields that could possibly be included in a request
-        # or response, including fields specified explicitly above.
-        fields = ['password', 'confirm_password']
 
 
 class LoginSerializer(serializers.Serializer):
@@ -160,6 +152,15 @@ class LoginSerializer(serializers.Serializer):
             'token': user.token
 
         }
+        return instance
+
+
+class PasswordResetSerializer(PasswordSerializer, serializers.ModelSerializer):
+    class Meta:
+        model = User
+        # List all of the fields that could possibly be included in a request
+        # or response, including fields specified explicitly above.
+        fields = ['password', 'confirm_password']
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -211,7 +212,6 @@ class UserSerializer(serializers.ModelSerializer):
         # the model. It's worth pointing out that `.set_password()` does not
         # save the model.
         instance.save()
-
         return instance
 
 
