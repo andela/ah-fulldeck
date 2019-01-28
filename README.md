@@ -74,6 +74,24 @@ https://ah-fulldeck-staging.herokuapp.com/api/v1/docs
 
    `export EMAIL_PORT=587`
 
+   `export GOOGLE_OAUTH2_KEY='473249897631-qg1s7bbg9a2gflq7omjk3r7qhnqmmamh.apps.googleusercontent.com'`
+    
+   `export GOOGLE_OAUTH2_SECRET='Z_3MSVULXNPSkwUPRv-dYQ53'`
+
+   `export FACEBOOK_KEY='336617310278979'`
+
+   `export FACEBOOK_SECRET='342f823250b66a873a9a795c90c215b5'`
+
+   `export TWITTER_KEY='YawQxOxPWFGYTeASKViC9FtGi'`
+
+   `export TWITTER_SECRET='LiZZrg8X5mEK4Pc0iDFcSBzilEnoJ7AhCtMNQ4fTKZWf9BhVbh'`
+
+   `export FACEBOOK_TOKEN='EAAEyJtM0VUMBAH3GbEZA3wZBuboZApAKrHVPXX7Fwi3F50tj9c6GGgNyU8EeYPq8hrZC1zTpqG9KcypSl8VYHyZCcwZCmeALqf1rcBjHdJ0kyMlVJNLZBTbvV1UvseknVYrWaXqZAfGInAZCtWOePvfhwp81ymGvqdLkNS38OaQDkXsUm8JhZBPFYPeFkIL0BCfZANdDrd9woc1fo3TeDSJU2NBccjmyBNCvSEZD'`
+
+   `export TWITTER_TOKEN='1087685693659332609-9ZPBbVerMEDUrcIKHGhyC8fzv1bpeh'`
+
+   `export TWITTER_TOKEN_SECRET='3hUSleVtoFTZzfxVSsUTZTQgCxtM7IZWQM0ExJh4PJj2n'`
+
 1. Export the settings by running the command: `source .env`
 
 1. Migrate the database:

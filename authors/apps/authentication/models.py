@@ -76,10 +76,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     # falsed.
     is_staff = models.BooleanField(default=False)
 
-    #The is_verified flag is used to determine who has verified their accounts or not
-    #The flag will always be false by default until the account has been verified
+    # The is_verified flag is used to determine 
+    # who has verified their accounts or not
+    # The flag will always be false by default 
+    # until the account has been verified
     is_verified = models.BooleanField(default=False)
-    
+
     # A timestamp representing when this object was created.
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -134,6 +136,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         Generates a JWT that stores this user's email and has an expiry
         date set to 1 day into the future.
         """
+
         dt = datetime.now() + timedelta(days=1)
         data = {
             'email': self.email,
@@ -142,4 +145,3 @@ class User(AbstractBaseUser, PermissionsMixin):
         token = jwt.encode(data, settings.SECRET_KEY, algorithm='HS256')
 
         return token.decode('utf-8')
-    
