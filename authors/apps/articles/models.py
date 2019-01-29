@@ -173,3 +173,11 @@ class FavoriteArticle(models.Model):
 
     def __str__(self):
         return "{}".format(self.article)
+
+
+class ReportArticle(models.Model):
+    """This class creates models for reporting articles"""
+    article = models.ForeignKey(
+        Article, to_field='slug', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, to_field='email', on_delete=models.CASCADE)
+    report_msg = models.CharField(null=False, max_length=2000)

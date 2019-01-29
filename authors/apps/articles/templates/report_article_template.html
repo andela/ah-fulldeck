@@ -1,0 +1,28 @@
+<!--
+This template creates a UI for requesting users to verify their emails.
+REQUIRED PARAMETERS:
+    username - the username of the user
+    verification_link - the activation link for the user
+!-->
+{% extends 'base.html' %}
+{% block content %}
+
+    <div>
+        <p><b>Hello Admin</b>, </p>
+        <p>{{name}} is reporting an article wriiten by {{article_author}}</p>
+        <p>
+                <b>Article title: </b>{{article_title}}
+        </p>
+        <p>
+                <b>Message: </b>{{report}}
+        </p>
+        <br/>
+        <a href ="{{ link }}"> {{ button_content }}</a>
+        <br/>
+        <br/>
+        <p>Regards,</p>
+        <p>Fulldeck Team &copy; 2019</p>
+    </div>
+
+{% endblock %}
+

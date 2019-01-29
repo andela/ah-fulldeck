@@ -1,10 +1,9 @@
+from django.db.models import Avg
 from rest_framework import serializers
+from collections import Counter
 
 from .models import (Article, Comment, LikeDislike,
-                     ArticleRatings, Tag, FavoriteArticle)
-from django.db.models import Avg
-from collections import Counter
-from rest_framework.validators import UniqueValidator
+                     ArticleRatings, Tag, FavoriteArticle, ReportArticle)
 from authors.apps.profiles.serializers import ProfileSerializer
 from authors.apps.profiles.models import Profile
 from authors.apps.articles.relations import TagRelation
@@ -204,3 +203,10 @@ class CommentHistorySerializer(serializers.ModelSerializer):
         model = Comment
         fields = ('id', 'body',
                   'created_at', 'updated_at',)
+
+
+class ReportArticlesSerializer(serializers.ModelSerializer):
+    """This class adds a model serializer for reporting article"""
+    class Meta:
+        model = ReportArticle
+        fields = ('article', 'user', 'report_msg')
