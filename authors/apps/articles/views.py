@@ -1,20 +1,20 @@
+from rest_framework.permissions import (IsAuthenticatedOrReadOnly,
+                                        IsAuthenticated)
 from rest_framework.generics import (
-    ListCreateAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView, RetrieveAPIView)
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
-
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+    ListCreateAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView,
+    RetrieveAPIView)
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from django.contrib.contenttypes.models import ContentType
-
-
+from django.shortcuts import get_object_or_404
 from .models import Article, Comment, LikeDislike, ArticleRatings
-from .serializers import ArticleSerializers, CommentsSerializers, LikeDislikeSerializer, RatingSerializer
 from .renderers import ArticleJsonRenderer, RatingJSONRenderer
 from collections import Counter
 from django.db.models import Avg
 from .permissions import IsOwnerOrReadonly
+from .serializers import (ArticleSerializers, CommentsSerializers,
+                          LikeDislikeSerializer, RatingSerializer)
 
 
 def article_not_found():
@@ -215,18 +215,22 @@ class LikeDislikeView(CreateAPIView):
     model = None    # Data Model - Articles or Comments
     vote_type = None  # Vote type Like/Dislike
 
-    def post(self, request, slug):
+    def post(self, request, slug=None, id=None):
         """
-        This view enables a user to like or dislike an article
+        This view enables a user to like or dislike an article or specific
+        comment
         """
         # check an article is existing
-        article = get_article(slug)
+        if self.model.__name__ is 'Article':
+            obj = get_object_or_404(Article, slug=slug)
+        else:  # model is comment
+            obj = get_object_or_404(Comment, id=id)
 
         try:
             # if user has ever voted
             like_dislike = LikeDislike.objects.get(
-                content_type=ContentType.objects.get_for_model(article),
-                object_id=article.id,
+                content_type=ContentType.objects.get_for_model(obj),
+                object_id=obj.id,
                 user=request.user)
             # check if the user has liked or disliked the article or comment already
             if like_dislike.vote is not self.vote_type:
@@ -238,15 +242,15 @@ class LikeDislikeView(CreateAPIView):
                 like_dislike.delete()
                 result = False
         except LikeDislike.DoesNotExist:
-            # user has never voted for the article, create new record.
-            article.votes.create(user=request.user, vote=self.vote_type)
+            # user has never voted for the article or comment, create new record.
+            obj.votes.create(user=request.user, vote=self.vote_type)
             result = True
 
         return Response({
             "status": result,
-            "likes": article.votes.likes().count(),
-            "dislikes": article.votes.dislikes().count(),
-            "Total": article.votes.sum_rating()
+            "likes": obj.votes.likes().count(),
+            "dislikes": obj.votes.dislikes().count(),
+            "Total": obj.votes.sum_rating()
         },
             content_type="application/json",
             status=status.HTTP_201_CREATED
