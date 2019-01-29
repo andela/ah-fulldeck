@@ -7,6 +7,7 @@ class TestBaseCase(APITestCase):
         self.signup_url = reverse('app_authentication:signup')
         self.login_url = reverse('app_authentication:login')
         self.create_list_article_url = reverse('articles:articles')
+        self.get_tags_url = reverse('articles:articles-tags')
         self.test_user = {
             'user': {
                 'username': 'testuser',
@@ -24,6 +25,7 @@ class TestBaseCase(APITestCase):
                 "title": "Test Article",
                 "description": "Test description for the article",
                 "body": "Test body for the article",
+                "tags": ["test", "tags"],
                 "author": 1
             }
         }
@@ -83,6 +85,10 @@ class TestBaseCase(APITestCase):
         token = response.data['token']
         return token
 
+    def authorize(self):
+        token = self.login_user2()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
     def create_article(self):
         token = self.login_user()
         url = self.create_list_article_url
@@ -98,7 +104,7 @@ class TestBaseCase(APITestCase):
 
     def single_article_details(self):
         slug = self.create_article()
-        url = reverse('articles:article-details', {slug: 'slug'})
+        url = reverse('articles:article-details',  args=[slug])
         return url
 
     def create_comment(self, slug):

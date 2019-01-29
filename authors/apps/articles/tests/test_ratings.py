@@ -89,7 +89,6 @@ class TestRating(TestBaseCase):
                                     data=bad_rating,
                                     format="json",
                                     HTTP_AUTHORIZATION='Token ' + token)
-        
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        message = "You have rated this article successfully"
+        self.http_400_badrequest(response)
+        message = "Rating should be a number between 1 and 5"
         self.base_rating(message, response)

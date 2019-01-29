@@ -1,20 +1,29 @@
 from rest_framework.permissions import (IsAuthenticatedOrReadOnly,
                                         IsAuthenticated)
-from rest_framework.generics import (
-    ListCreateAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView,
-    RetrieveAPIView)
+
+from rest_framework.generics import (ListCreateAPIView,
+                                     RetrieveUpdateDestroyAPIView,
+                                     CreateAPIView,
+                                     RetrieveAPIView,
+                                     ListAPIView)
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
-from .models import Article, Comment, LikeDislike, ArticleRatings
+
+
+from .models import Article, Comment, LikeDislike, ArticleRatings, Tag
+from .serializers import (ArticleSerializers,
+                          CommentsSerializers,
+                          LikeDislikeSerializer,
+                          RatingSerializer,
+                          TagSerializer)
 from .renderers import ArticleJsonRenderer, RatingJSONRenderer
+from .permissions import IsOwnerOrReadonly
+
 from collections import Counter
 from django.db.models import Avg
-from .permissions import IsOwnerOrReadonly
-from .serializers import (ArticleSerializers, CommentsSerializers,
-                          LikeDislikeSerializer, RatingSerializer)
 
 
 def article_not_found():
@@ -319,3 +328,14 @@ class RatingDetails(RetrieveAPIView):
                 'total_user_rates': total_user_rates,
                 'each_rating': each_rating
             }, status=status.HTTP_200_OK)
+
+
+class TagsView(ListAPIView):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def list(self, request):
+        data = self.get_queryset()
+        serializer = self.serializer_class(data, many=True)
+        return Response({'tags': serializer.data}, status=status.HTTP_200_OK)

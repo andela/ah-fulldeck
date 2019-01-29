@@ -15,7 +15,10 @@ class ArticleJsonRenderer(renderers.BaseRenderer):
         # Used to display the articles
         if isinstance(data, list):
             return json.dumps(
-                {'articles': data})
+                {
+                    'articles': data,
+                    'article_count': len(data)
+                })
         else:
             # checks if the data received is an error message
             error = data.get('detail')
