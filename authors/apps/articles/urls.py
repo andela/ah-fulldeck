@@ -48,5 +48,11 @@ urlpatterns = [
          views.CommentHistory.as_view(),
          name='comment-history'),
     path('articles/<slug>/highlight/',
-         views.HighlightAPIView.as_view(), name='highlighttext')
+         views.HighlightAPIView.as_view(), name='highlighttext'),
+    path('<slug>/share/email/', views.ShareArticleViaEmail.as_view(),
+         name="email_share_article"),
+    path('<slug>/share/facebook/', views.ShareArticleViaFacebook.as_view(),
+         name="facebook-share-article"),
+    path('<slug>/share/twitter/', views.ShareArticleViaTwitter.as_view(),
+         name="twitter-share-article")
 ]

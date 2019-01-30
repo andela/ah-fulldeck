@@ -221,3 +221,15 @@ class TestBaseCase(APITestCase):
     def highlight_url(self, slug):
         url = reverse('articles:highlighttext', kwargs={"slug": slug})
         return url
+
+    def article_email_share_url(self, slug):
+        url = reverse('articles:email_share_article', kwargs={"slug": slug})
+        return url
+    
+    def article_twitter_share_url(self, slug):
+        url = reverse('articles:twitter-share-article', kwargs={"slug": slug})
+        return url
+
+    def article_facebook_share_url(self, slug):
+        url = reverse('articles:facebook-share-article', kwargs={"slug": slug})
+        return url

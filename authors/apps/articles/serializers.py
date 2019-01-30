@@ -210,3 +210,11 @@ class ReportArticlesSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReportArticle
         fields = ('article', 'user', 'report_msg')
+
+
+class EmailCheckSerializer(serializers.Serializer):
+    email = serializers.EmailField(
+        error_messages={
+            'invalid': 'Email must be of the format name@domain.com'
+        }
+    )
