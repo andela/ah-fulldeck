@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django_inlinecss',
     'django.contrib.staticfiles',
+    'simple_history',
 
     'corsheaders',
     'django_extensions',
@@ -61,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
 
 ]
 AUTHENTICATION_BACKENDS = (

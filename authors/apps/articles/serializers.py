@@ -182,7 +182,18 @@ class FavoriteArticlesSerializer(serializers.ModelSerializer):
     def get_title(self, favorite_object):
         title = favorite_object.article.title
         return title
-        
+
     class Meta:
         model = FavoriteArticle
         fields = ('title', 'author', 'article', 'user')
+
+
+class CommentHistorySerializer(serializers.ModelSerializer):
+    """
+    This class handles the history of the comment edited
+    """
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'body',
+                  'created_at', 'updated_at',)

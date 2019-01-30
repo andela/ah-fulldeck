@@ -1,10 +1,10 @@
 from django.urls import reverse
-from rest_framework.test import APITestCase,APIClient
+from rest_framework.test import APITestCase, APIClient
 
 
 class TestBaseCase(APITestCase):
     def setUp(self):
-        self.client=APIClient()
+        self.client = APIClient()
         self.signup_url = reverse('app_authentication:signup')
         self.login_url = reverse('app_authentication:login')
         self.create_list_article_url = reverse('articles:articles')
@@ -133,6 +133,18 @@ class TestBaseCase(APITestCase):
                       kwargs={"slug": slug, "id": id})
         return url
 
+    def update_comment(self):
+        token = self.login_user()
+        slug = self.create_article()
+        response = self.add_comment(slug)
+        id = response.data['id']
+        response = self.client.put(
+            (self.specific_comment(slug, id)),
+            data={'comment': {'body': 'New comment'}},
+            format='json',
+            HTTP_AUTHORIZATION="Token " + token)
+        return response
+
     def like_arcticle_url(self, slug):
         url = reverse('articles:article_like', args=[slug])
         return url
@@ -159,14 +171,16 @@ class TestBaseCase(APITestCase):
     def my_favorites_url(self):
         url = reverse('articles:all_favourites')
         return url
-    
-    def authorize(self):
-        token = self.login_user2()
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
     def bookmark_article_url(self, slug):
         url = reverse('articles:article-bookmark', kwargs={"slug": slug})
         return url
 
     def get_bookmarks_url(self):
         url = reverse('articles:article-bookmarks')
+        return url
+
+    def edit_history_url(self, slug, id):
+        url = reverse('articles:comment-history',
+                      kwargs={"slug": slug, "id": id})
         return url

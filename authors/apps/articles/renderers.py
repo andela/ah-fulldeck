@@ -33,7 +33,7 @@ class RatingJSONRenderer(renderers.JSONRenderer):
 
     media_type = 'application/json'
     format = 'json'
-    
+
     def render(self, data, accepted_media_type=None, renderer_context=None):
         if isinstance(data, dict):
             return json.dumps(
