@@ -1,11 +1,12 @@
 from rest_framework import serializers
 
-from .models import Article, Comment, LikeDislike, ArticleRatings
+from .models import Article, Comment, LikeDislike, ArticleRatings, Tag
 from django.db.models import Avg
 from collections import Counter
 from rest_framework.validators import UniqueValidator
 from authors.apps.profiles.serializers import ProfileSerializer
 from authors.apps.profiles.models import Profile
+from authors.apps.articles.relations import TagRelation
 
 
 class ArticleSerializers(serializers.ModelSerializer):
@@ -35,6 +36,7 @@ class ArticleSerializers(serializers.ModelSerializer):
     )
     avg_rating = serializers.SerializerMethodField(
         method_name='average_rating')
+    tags = TagRelation(many=True, required=False)
     author = serializers.SerializerMethodField(read_only=True)
 
     slug = serializers.CharField(read_only=True)
@@ -53,6 +55,7 @@ class ArticleSerializers(serializers.ModelSerializer):
             'body',
             'slug',
             'avg_rating',
+            'tags',
             'image_url',
             'author',
             'created_at',
@@ -73,6 +76,15 @@ class ArticleSerializers(serializers.ModelSerializer):
             'total_user_rates': total_user_rates,
             'each_rating': each_rating
         }
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ('tag',)
+
+    def to_representation(self, instance):
+        return instance.tag
 
 
 class CommentsSerializers(serializers.ModelSerializer):
@@ -131,14 +143,6 @@ class RatingSerializer(serializers.ModelSerializer):
         model = ArticleRatings
         fields = ['rating', 'rated_by']
         read_only_fields = ['rated_by']
-        
-
-class LikeDislikeSerializer(serializers.Serializer):
-    """
-    serializer class for the Like Dislike model
-    """
-    class Meta:
-        model = LikeDislike
 
     def create(self, validated_data):
         rating = ArticleRatings.objects.create(**validated_data)
@@ -156,3 +160,12 @@ class LikeDislikeSerializer(serializers.Serializer):
                 raise serializers.ValidationError(
                     "Rating should be a number between 1 and 5")
         return {'rating': rating}
+        
+
+class LikeDislikeSerializer(serializers.Serializer):
+    """
+    serializer class for the Like Dislike model
+    """
+    class Meta:
+        model = LikeDislike
+

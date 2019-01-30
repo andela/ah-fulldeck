@@ -78,6 +78,7 @@ class Article(models.Model):
     title = models.CharField(max_length=1000, blank=False)
     description = models.CharField(max_length=2000, blank=False)
     body = models.TextField(blank=False)
+    tags = models.ManyToManyField('articles.Tag', related_name='articles')
     image_url = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
     updated_at = models.DateTimeField(auto_now=True, auto_now_add=False)
@@ -151,3 +152,13 @@ class ArticleRatings(models.Model):
         Article, on_delete=models.CASCADE, related_name='articleratings')
     rating = models.IntegerField(default=0)
     rated_by = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
+class Tag(models.Model):
+    """
+    Articles should have tags that help categorize them
+    """
+    tag = models.CharField(max_length=80)
+
+    def __str__(self):
+        return self.tag
