@@ -3,9 +3,9 @@ from rest_framework.generics import (ListCreateAPIView,
                                      CreateAPIView,
                                      RetrieveAPIView,
                                      ListAPIView)
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import (IsAuthenticatedOrReadOnly,
                                         IsAuthenticated)
+from authors.apps.core.pagination import StandardPagination
 from rest_framework.views import APIView
 from .permissions import IsOwnerOrReadonly
 from rest_framework.response import Response
@@ -41,14 +41,7 @@ def get_article(slug):
         article_not_found()
 
 
-class StandardPagination(PageNumberPagination):
-    page_size = 10
-    page_size_query_param = 'page_size'
-    max_page_size = 100
-
-
 class ListCreateArticle(ListCreateAPIView):
-    pagination_class = StandardPagination
     queryset = Article.objects.all()
     renderer_classes = (ArticleJsonRenderer,)
     serializer_class = ArticleSerializers

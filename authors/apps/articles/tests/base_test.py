@@ -9,6 +9,7 @@ class TestBaseCase(APITestCase):
         self.login_url = reverse('app_authentication:login')
         self.create_list_article_url = reverse('articles:articles')
         self.get_tags_url = reverse('articles:articles-tags')
+        self.list_users_url = reverse('profiles:profile_list')
         self.test_user = {
             'user': {
                 'username': 'testuser',
