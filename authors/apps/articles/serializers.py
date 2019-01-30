@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Article, Comment, LikeDislike, ArticleRatings, Tag
+from .models import Article, Comment, LikeDislike, ArticleRatings, Tag, FavoriteArticle
 from django.db.models import Avg
 from collections import Counter
 from rest_framework.validators import UniqueValidator
@@ -160,7 +160,7 @@ class RatingSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     "Rating should be a number between 1 and 5")
         return {'rating': rating}
-        
+
 
 class LikeDislikeSerializer(serializers.Serializer):
     """
@@ -169,3 +169,20 @@ class LikeDislikeSerializer(serializers.Serializer):
     class Meta:
         model = LikeDislike
 
+
+class FavoriteArticlesSerializer(serializers.ModelSerializer):
+    """Class to serialise favorite articles"""
+    author = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
+
+    def get_author(self, favorite_object):
+        author = favorite_object.article.author.username
+        return author
+
+    def get_title(self, favorite_object):
+        title = favorite_object.article.title
+        return title
+        
+    class Meta:
+        model = FavoriteArticle
+        fields = ('title', 'author', 'article', 'user')

@@ -162,3 +162,11 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.tag
+
+
+class FavoriteArticle(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "{}".format(self.article)
