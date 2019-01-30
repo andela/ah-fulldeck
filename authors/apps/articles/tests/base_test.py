@@ -163,3 +163,10 @@ class TestBaseCase(APITestCase):
     def authorize(self):
         token = self.login_user2()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    def bookmark_article_url(self, slug):
+        url = reverse('articles:article-bookmark', kwargs={"slug": slug})
+        return url
+
+    def get_bookmarks_url(self):
+        url = reverse('articles:article-bookmarks')
+        return url

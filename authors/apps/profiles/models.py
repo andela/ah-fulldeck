@@ -14,6 +14,8 @@ class Profile(models.Model):
     following = models.ManyToManyField(
         'self', related_name='is_following', symmetrical=False)
     followers = models.ManyToManyField('self', symmetrical=False)
+    bookmarks = models.ManyToManyField('articles.Article',
+                                       related_name='bookmarks')
 
     def __str__(self):
         return self.user.username

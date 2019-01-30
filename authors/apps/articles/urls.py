@@ -7,6 +7,8 @@ app_name = "articles"
 
 urlpatterns = [
     path('articles/', views.ListCreateArticle.as_view(), name='articles'),
+    path('articles/bookmarks/',
+         views.BookMarkDetails.as_view(), name='article-bookmarks'),
     path('articles/<slug>/', views.RetrieveUpdateDeleteArticle.as_view(),
          name='article-details'),
     path('articles/<slug>/comments/',
@@ -37,5 +39,8 @@ urlpatterns = [
     path('articles/<slug>/favorite/',
          views.FavouriteArticleView.as_view(), name="article-favorite"),
     path('favorites/', views.GetUserFavorites.as_view(),
-         name='all_favourites')
+         name='all_favourites'),
+    path('articles/<slug>/bookmark/',
+         views.BookMark.as_view(), name='article-bookmark')
+
 ]
