@@ -1,29 +1,31 @@
+from rest_framework.generics import (ListCreateAPIView,
+                                     RetrieveUpdateDestroyAPIView,
+                                     CreateAPIView,
+                                     RetrieveAPIView,
+                                     ListAPIView)
 from rest_framework.pagination import PageNumberPagination
-from .permissions import IsOwnerOrReadonly
-from authors.apps.authentication.models import User
-from rest_framework.views import APIView
-from collections import Counter
-from django.contrib.contenttypes.models import ContentType
-from .renderers import ArticleJsonRenderer, RatingJSONRenderer
-from .models import (Article, Comment, LikeDislike, ArticleRatings,
-                     FavoriteArticle, Tag)
-from django.shortcuts import get_object_or_404
 from rest_framework.permissions import (IsAuthenticatedOrReadOnly,
                                         IsAuthenticated)
-from rest_framework.generics import (
-    ListCreateAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView,
-    RetrieveAPIView, ListAPIView)
+from rest_framework.views import APIView
+from .permissions import IsOwnerOrReadonly
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
+from collections import Counter
+from django.contrib.contenttypes.models import ContentType
+from django.shortcuts import get_object_or_404
+from django.db.models import Avg
+from .renderers import ArticleJsonRenderer, RatingJSONRenderer
+from authors.apps.authentication.models import User
+from .models import (Article, Comment, LikeDislike, ArticleRatings,
+                     FavoriteArticle, Tag)
 from .serializers import (ArticleSerializers,
                           CommentsSerializers,
                           LikeDislikeSerializer,
                           RatingSerializer,
                           FavoriteArticlesSerializer,
-                          TagSerializer)
-
-from django.db.models import Avg
+                          TagSerializer,
+                          CommentHistorySerializer)
 
 
 def article_not_found():
@@ -431,5 +433,33 @@ class BookMarkDetails(RetrieveAPIView):
         data = {
             "User": user.username,
             "Bookmarked articles": serializer.data
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class CommentHistory(ListCreateAPIView):
+    """
+    Retrieve comments history with
+    comment id
+    """
+    serializer_class = CommentHistorySerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, id, slug, **kwargs):
+
+        article = get_article(slug)
+        comment = article.comments.filter(id=id).first()
+        if not comment:
+            message = {'error': 'Comment not found'}
+            return Response(message, status=status.HTTP_404_NOT_FOUND)
+        id = self.kwargs['id']
+        edited_comment = Comment.history.filter(id=id)
+        if not edited_comment:
+            message = {'error': 'No edit history for this comment'}
+            return Response(message, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.serializer_class(edited_comment, many=True)
+        data = {
+            'Comment Edit History': serializer.data
         }
         return Response(data, status=status.HTTP_200_OK)

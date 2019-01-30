@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import (GenericRelation,
                                                 GenericForeignKey)
+from simple_history.models import HistoricalRecords
 
 from authors.apps.authentication.models import User
 
@@ -136,6 +137,7 @@ class Comment(models.Model):
         on_delete=models.CASCADE
     )
     votes = GenericRelation(LikeDislike, related_query_name='comment')
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.body

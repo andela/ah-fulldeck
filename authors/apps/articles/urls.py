@@ -41,6 +41,9 @@ urlpatterns = [
     path('favorites/', views.GetUserFavorites.as_view(),
          name='all_favourites'),
     path('articles/<slug>/bookmark/',
-         views.BookMark.as_view(), name='article-bookmark')
+         views.BookMark.as_view(), name='article-bookmark'),
 
+    path('<slug>/comments/<int:id>/history/',
+         views.CommentHistory.as_view(),
+         name='comment-history'),
 ]
