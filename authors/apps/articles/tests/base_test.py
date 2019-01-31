@@ -205,6 +205,17 @@ class TestBaseCase(APITestCase):
         token = self.login_user2()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
+    def rate_article(self, slug):
+        url = self.rating_url(slug)
+        token = self.login_user2()
+        response = self.client.post(
+            url,
+            self.rating,
+            format="json",
+            HTTP_AUTHORIZATION="Token " + token
+        )
+        return response
+
     def bookmark_article_url(self, slug):
         url = reverse('articles:article-bookmark', kwargs={"slug": slug})
         return url
@@ -233,3 +244,13 @@ class TestBaseCase(APITestCase):
     def article_facebook_share_url(self, slug):
         url = reverse('articles:facebook-share-article', kwargs={"slug": slug})
         return url
+    def view_single_article(self):
+        response = self.client.get(self.single_article_details())
+        return response
+
+    def article_stats(self):
+        token = self.login_user()
+        response = self.client.get(reverse(
+            'articles:article-stats'),
+            HTTP_AUTHORIZATION="Token " + token, format="json")
+        return response

@@ -54,5 +54,7 @@ urlpatterns = [
     path('<slug>/share/facebook/', views.ShareArticleViaFacebook.as_view(),
          name="facebook-share-article"),
     path('<slug>/share/twitter/', views.ShareArticleViaTwitter.as_view(),
-         name="twitter-share-article")
+         name="twitter-share-article"),
+    path('statistics/',
+         views.ArticlesStatsView.as_view(), name='article-stats')
 ]
