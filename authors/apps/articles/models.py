@@ -128,7 +128,8 @@ class Comment(models.Model):
     author = models.ForeignKey(
         User, related_name='comments', on_delete=models.CASCADE)
     article = models.ForeignKey(
-        Article, related_name='comments', on_delete=models.CASCADE)
+        Article, related_name='comments', on_delete=models.CASCADE, null=True)
+    highlighted_text = models.TextField(null=True)
     parent = models.ForeignKey(
         'self',
         null=True,

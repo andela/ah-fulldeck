@@ -122,18 +122,20 @@ class CommentView(ListCreateAPIView):
     serializer_class = CommentsSerializers
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
-    def post(self, request, slug):
+    def post(self, request, slug, *args, **kwargs):
         """
         Method for creating article
         """
         article = get_article(slug)
-
-        comment = request.data.get('comment', {})
-        comment['author'] = request.user.id
-        comment['article'] = article.pk
-        serializer = self.serializer_class(data=comment)
+        serializer_context = {
+            'request': request.data["comment"]["body"],
+            'author': request.user,
+            'article': article
+        }
+        serializer = self.serializer_class(
+            data=request.data["comment"], context=serializer_context)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        serializer.save(author=request.user, article_id=article.id)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get(self, request, slug):
@@ -171,7 +173,8 @@ class CommentDetails(RetrieveUpdateDestroyAPIView,
 
     def create(self, request, slug, id):
         """Method for creating a child comment on parent comment."""
-
+        context = super(CommentDetails,
+                        self).get_serializer_context()
         article = get_article(slug)
         try:
             parent_comment = article.comments.filter(id=id).first().pk
@@ -179,18 +182,16 @@ class CommentDetails(RetrieveUpdateDestroyAPIView,
             message = {'detail': 'Comment not found.'}
             return Response(message, status=status.HTTP_404_NOT_FOUND)
         body = request.data.get('comment', {})['body']
-
         data = {
             'body': body,
             'parent': parent_comment,
-            'article': article.pk,
-            'author': request.user.id
+            'article': article.pk
         }
 
         serializer = self.serializer_class(
-            data=data)
+            data=data, context=context)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        serializer.save(author=self.request.user, article_id=article.pk)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, slug, id):
@@ -463,3 +464,51 @@ class CommentHistory(ListCreateAPIView):
             'Comment Edit History': serializer.data
         }
         return Response(data, status=status.HTTP_200_OK)
+class HighlightAPIView(ListCreateAPIView):
+    permission_classes = (IsAuthenticatedOrReadOnly, )
+    serializer_class = ArticleSerializers
+
+    def post(self, request, slug):
+        article = get_article(slug)
+        data_fields = ["start_index", "end_index", "body"]
+        for field in data_fields:
+            if field not in request.data:
+                msg = "{} field cannot be empty".format(field)
+                return Response({"error": msg},
+                                status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.serializer_class(article)
+        start_index = request.data['start_index']
+        end_index = request.data['end_index']
+        article_body = serializer.data['body']
+        indices = [start_index, end_index]
+        for index in indices:
+            if not isinstance(index, int):
+                return Response({"error": "Indices must be of integer format"},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+        if (start_index >= end_index):
+            msg = "Start index can't be greater than or equal to end index"
+            return Response({
+                "error": msg
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if (end_index > len(article_body)):
+            msg = "Indices should be in the range 0 and {}".format(
+                len(article_body))
+            return Response({
+                "error": msg
+            }, status=status.HTTP_400_BAD_REQUEST)
+        context = {
+            "request": request.data["body"],
+            "author": request.user,
+            "article": article
+        }
+        highlighted_text = article_body[start_index:end_index]
+
+        serializer = CommentsSerializers(data=request.data,
+                                         context=context)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(author=request.user, article_id=article.id,
+                        highlighted_text=highlighted_text)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

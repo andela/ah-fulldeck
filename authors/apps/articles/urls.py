@@ -46,4 +46,6 @@ urlpatterns = [
     path('<slug>/comments/<int:id>/history/',
          views.CommentHistory.as_view(),
          name='comment-history'),
+    path('articles/<slug>/highlight/',
+         views.HighlightAPIView.as_view(), name='highlighttext')
 ]

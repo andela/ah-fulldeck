@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from .models import Article, Comment, LikeDislike, ArticleRatings, Tag, FavoriteArticle
+from .models import (Article, Comment, LikeDislike,
+                     ArticleRatings, Tag, FavoriteArticle)
 from django.db.models import Avg
 from collections import Counter
 from rest_framework.validators import UniqueValidator
@@ -95,12 +96,18 @@ class CommentsSerializers(serializers.ModelSerializer):
             'required': 'Comments field cannot be blank'
         }
     )
+    author = serializers.SerializerMethodField()
+    highlighted_text = serializers.CharField(read_only=True)
 
     class Meta:
         model = Comment
         fields = ('id', 'body', 'created_at', 'updated_at',
-                  'author', 'article', 'parent')
+                  'author', 'article', 'parent', 'highlighted_text')
 
+    def get_author(self, comment):
+        author = ProfileSerializer(comment.author.username)
+        return author
+       
     def format_date(self, date):
         return date.strftime('%d %b %Y %H:%M:%S')
 
