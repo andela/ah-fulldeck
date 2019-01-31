@@ -72,7 +72,11 @@ class TestBaseCase(APITestCase):
         }
         self.missing_highlight_field = {
             "end_index": 4,
-            "body": "This is not epic at all"
+            "body": "This is not epic at all"}
+        self.report_message = {
+            "report": {
+                "report_msg": "This article is offensive"
+            }
         }
 
     def remove_data(self, keys=None):
@@ -196,6 +200,10 @@ class TestBaseCase(APITestCase):
     def my_favorites_url(self):
         url = reverse('articles:all_favourites')
         return url
+
+    def authorize(self):
+        token = self.login_user2()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
     def bookmark_article_url(self, slug):
         url = reverse('articles:article-bookmark', kwargs={"slug": slug})

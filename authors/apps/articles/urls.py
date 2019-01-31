@@ -42,7 +42,8 @@ urlpatterns = [
          name='all_favourites'),
     path('articles/<slug>/bookmark/',
          views.BookMark.as_view(), name='article-bookmark'),
-
+    path('articles/<slug>/report/',
+         views.ReportArticlesView.as_view(), name='report-article'),
     path('<slug>/comments/<int:id>/history/',
          views.CommentHistory.as_view(),
          name='comment-history'),
