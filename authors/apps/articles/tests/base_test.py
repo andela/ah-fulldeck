@@ -49,6 +49,30 @@ class TestBaseCase(APITestCase):
                 "body": "This is a test comment body."
             }
         }
+        self.highlight_data = {
+            "start_index": 1,
+            "end_index": 4,
+            "body": "This is not epic at all"
+        }
+        self.start_index_greater_than_end_index = {
+            "start_index": 4,
+            "end_index": 1,
+            "body": "This is not epic at all"
+        }
+        self.highlight_index_not_integer = {
+            "start_index": "1",
+            "end_index": 5,
+            "body": "This is not epic at all"
+        }
+        self.highlight_out_of_range = {
+            "start_index": 1,
+            "end_index": 100,
+            "body": "This is not epic at all"
+        }
+        self.missing_highlight_field = {
+            "end_index": 4,
+            "body": "This is not epic at all"
+        }
 
     def remove_data(self, keys=None):
         if keys:
@@ -183,4 +207,8 @@ class TestBaseCase(APITestCase):
     def edit_history_url(self, slug, id):
         url = reverse('articles:comment-history',
                       kwargs={"slug": slug, "id": id})
+        return url
+
+    def highlight_url(self, slug):
+        url = reverse('articles:highlighttext', kwargs={"slug": slug})
         return url
