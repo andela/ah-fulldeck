@@ -33,3 +33,6 @@ class Profile(models.Model):
 
     def list_following(self, profile):
         return profile.following.all()
+
+    class Meta:
+        ordering = ['user__username']

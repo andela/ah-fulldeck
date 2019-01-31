@@ -1,12 +1,13 @@
 from rest_framework import status
 from rest_framework.generics import (
-    RetrieveUpdateAPIView, CreateAPIView, RetrieveAPIView)
+    RetrieveUpdateAPIView, CreateAPIView, RetrieveAPIView, ListAPIView)
 from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly, IsAuthenticated)
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError, NotFound
 
 from .exceptions import ProfileDoesNotExist
-from rest_framework.exceptions import ValidationError, NotFound
+from authors.apps.core.pagination import StandardPagination
 from .models import Profile
 from .renderers import (ProfileJSONRenderer, FollowUnfollowJsonRenderer,
                         FollowingFollowrsJsonRenderer)
@@ -36,8 +37,20 @@ def check_user_profile(request):
             'You must be logged in first')
 
 
+class ListProfile(ListAPIView):
+    renderer_classes = (ProfileJSONRenderer,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        paginator = StandardPagination()
+        queryset = Profile.objects.all().exclude(user=self.request.user)
+        result_page = paginator.paginate_queryset(queryset, request)
+        serializer = ProfileSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+
 class ProfileRetrieveAPIView(RetrieveUpdateAPIView):
-    permission_classes = (IsAuthenticatedOrReadOnly, )
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     renderer_classes = (ProfileJSONRenderer,)
     serializer_class = ProfileSerializer
 
