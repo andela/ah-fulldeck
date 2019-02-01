@@ -83,7 +83,7 @@ class FollowUnfollowTest(TestBaseCase):
         response = self.client.get(
             self.following_url(),
             HTTP_AUTHORIZATION='Token ' + token, format='json')
-        msesage = 'Here is a list users following testuser'
+        msesage = 'List of authors testuser is following'
         self.response_message_test(msesage, response)
         self.ok_200(response)
 
@@ -93,7 +93,7 @@ class FollowUnfollowTest(TestBaseCase):
         response = self.client.get(
             self.followers_url(),
             HTTP_AUTHORIZATION='Token ' + token, format='json')
-        msesage = 'Here is a list of followers'
+        msesage = 'List of authors following TestUser2'
         self.response_message_test(msesage, response)
         self.ok_200(response)
 
