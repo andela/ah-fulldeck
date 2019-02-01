@@ -15,9 +15,9 @@ Including another URLconf
 """
 from django.urls import path, include
 from django.contrib import admin
-from rest_framework_swagger.views import get_swagger_view
+from .swagger_json import schema_view
 
-schema_view = get_swagger_view(title='Authors Haven API')
+#schema_view = get_swagger_view(title='Authors Haven API')
 
 urlpatterns = [
     path('api/v1/docs', schema_view),

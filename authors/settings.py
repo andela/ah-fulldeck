@@ -109,18 +109,16 @@ DATABASES = {
 }
 
 SWAGGER_SETTINGS = {
-    'USE_SESSION_AUTH': False,
-    'enabled_methods': [
-        'get',
-        'post',
-        'put',
-        'delete',
-    ],
-    'SECURITY_DEFINITIONS': {
-        'api_key': {
-            'type': 'basic',
-        },
-    },
+  'SHOW_REQUEST_HEADERS': True,
+  'USE_SESSION_AUTH': False,
+  'DOC_EXPANSION': 'list',
+  'SECURITY_DEFINITIONS': {
+      'api_key': {
+          'type': 'apiKey',
+          'in': 'header',
+          'name': 'Authorization'
+      }
+  }
 }
 
 # email configurations
