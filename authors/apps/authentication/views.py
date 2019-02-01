@@ -8,8 +8,6 @@ from rest_framework.response import Response
 from authors import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
-from django.core.mail import EmailMultiAlternatives
-from django.utils.html import strip_tags
 from .renderers import UserJSONRenderer
 from .serializers import (
     LoginSerializer, RegistrationSerializer, UserSerializer,
@@ -18,8 +16,8 @@ from social_django.utils import load_strategy, load_backend
 from social_core.exceptions import MissingBackend
 from social_core.backends.oauth import BaseOAuth1, BaseOAuth2
 from authors.settings import SECRET_KEY
-from .send_email import send_email
 from .models import User
+from authors.apps.helpers.send_email import send_email
 
 
 class HomeView(ListAPIView):
@@ -46,27 +44,14 @@ class RegistrationAPIView(CreateAPIView):
         token = serializer.data['token']
         sender = os.getenv('EMAIL_SENDER')
 
-        sender = "ahfulldeck@gmail.com"
         current_site = get_current_site(request)
         verification_link = "http://" + current_site.domain + \
             '/api/v1/verify/{}'.format(token)
-        subject = "Authors Haven: Verification email"
         message_content = "Please verify that you requested to use this email address, \
             if you did not request this update, please ignore this \
             message."
-        button_content = "VERIFY EMAIL ADDRESS"
-        message = render_to_string('email_template.html', {
-            'verification_link': verification_link,
-            'message_content': message_content,
-            'button_content': button_content,
-            'title': subject,
-            'username': username,
-        })
-        body_content = strip_tags(message)
-        msg = EmailMultiAlternatives(subject, body_content, sender, to=[email])
-        msg.attach_alternative(message, "text/html")
-        msg.send()
-
+        email_data = [message_content, "VERIFY EMAIL ADDRESS", verification_link, username, '', '']
+        send_email("Authors Haven: Verification email", sender, email, email_data)
         response_message = {
             "message": "User registered successfully. Check your mail for verification",
             "user_info": serializer.data
@@ -136,7 +121,18 @@ class PasswordResetAPIView(generics.CreateAPIView):
         # confirm user exists
         user_exists = User.objects.filter(email=recipient).exists()
         if user_exists:
-            result = send_email(recipient, token, request)
+            subject = "Authors Haven: Password Reset"
+            sender = os.getenv('EMAIL_SENDER')
+            host_url = get_current_site(request)
+            reset_link = "http://" + host_url.domain + \
+                '/api/v1/users/password_update/'+token.decode()
+            message_content = "Please click the link below to reset your password"
+            button_content = "RESET YOUR PASSWORD"
+            email_data = [message_content, button_content, reset_link, '', '', '']
+            send_email(subject, sender, recipient, email_data)
+            result = {
+                'message': 'A password reset link has been sent to your email'
+            }
             return Response(result, status=status.HTTP_200_OK)
         else:  # If user does not exist
             result = {
