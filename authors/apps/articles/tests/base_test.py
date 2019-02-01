@@ -201,10 +201,6 @@ class TestBaseCase(APITestCase):
         url = reverse('articles:all_favourites')
         return url
 
-    def authorize(self):
-        token = self.login_user2()
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token)
-
     def rate_article(self, slug):
         url = self.rating_url(slug)
         token = self.login_user2()
@@ -236,7 +232,7 @@ class TestBaseCase(APITestCase):
     def article_email_share_url(self, slug):
         url = reverse('articles:email_share_article', kwargs={"slug": slug})
         return url
-    
+
     def article_twitter_share_url(self, slug):
         url = reverse('articles:twitter-share-article', kwargs={"slug": slug})
         return url
@@ -244,6 +240,7 @@ class TestBaseCase(APITestCase):
     def article_facebook_share_url(self, slug):
         url = reverse('articles:facebook-share-article', kwargs={"slug": slug})
         return url
+
     def view_single_article(self):
         response = self.client.get(self.single_article_details())
         return response

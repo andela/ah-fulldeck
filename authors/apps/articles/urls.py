@@ -1,60 +1,63 @@
 from django.urls import path
 
 from .models import Article, LikeDislike, Comment
-from . import views
+from .views import (article_views, bookmark_view, comment_views,
+                    favourite_view, likedislike_view, rating_view,
+                    report_view, tag_view, share_view, stats_view)
 
 app_name = "articles"
 
 urlpatterns = [
-    path('articles/', views.ListCreateArticle.as_view(), name='articles'),
+    path('articles/', article_views.ListCreateArticle.as_view(), name='articles'),
     path('articles/bookmarks/',
-         views.BookMarkDetails.as_view(), name='article-bookmarks'),
-    path('articles/<slug>/', views.RetrieveUpdateDeleteArticle.as_view(),
+         bookmark_view.BookMarkDetails.as_view(), name='article-bookmarks'),
+    path('articles/<slug>/', article_views.RetrieveUpdateDeleteArticle.as_view(),
          name='article-details'),
     path('articles/<slug>/comments/',
-         views.CommentView.as_view(), name='comments'),
+         comment_views.CommentView.as_view(), name='comments'),
     path('articles/<slug>/comments/<int:id>/',
-         views.CommentDetails.as_view(), name='comment-details'),
+         comment_views.CommentDetails.as_view(), name='comment-details'),
     path('articles/<slug>/like/',
-         views.LikeDislikeView.as_view(
+         likedislike_view.LikeDislikeView.as_view(
              model=Article, vote_type=LikeDislike.LIKE),
          name='article_like'),
     path('articles/<slug>/dislike/',
-         views.LikeDislikeView.as_view(
+         likedislike_view.LikeDislikeView.as_view(
              model=Article, vote_type=LikeDislike.DISLIKE),
          name='article_dislike'),
-    path('articles/<slug>/rate/', views.RatingView.as_view(),
+    path('articles/<slug>/rate/', rating_view.RatingView.as_view(),
          name='rate-articles'),
     path('articles/<slug>/ratings/',
-         views.RatingDetails.as_view(), name='article-ratings'),
+         rating_view.RatingDetails.as_view(), name='article-ratings'),
     path('comments/<int:id>/like/',
-         views.LikeDislikeView.as_view(model=Comment,
-                                       vote_type=LikeDislike.LIKE),
+         likedislike_view.LikeDislikeView.as_view(model=Comment,
+                                                  vote_type=LikeDislike.LIKE),
          name="comment_like"),
     path('comments/<int:id>/dislike/',
-         views.LikeDislikeView.as_view(model=Comment,
-                                       vote_type=LikeDislike.DISLIKE),
+         likedislike_view.LikeDislikeView.as_view(model=Comment,
+                                                  vote_type=LikeDislike.DISLIKE),
          name="comment_dislike"),
-    path('tags/', views.TagsView.as_view(), name="articles-tags"),
+    path('tags/', tag_view.TagsView.as_view(), name="articles-tags"),
     path('articles/<slug>/favorite/',
-         views.FavouriteArticleView.as_view(), name="article-favorite"),
-    path('favorites/', views.GetUserFavorites.as_view(),
+         favourite_view.FavouriteArticleView.as_view(), name="article-favorite"),
+    path('favorites/', favourite_view.GetUserFavorites.as_view(),
          name='all_favourites'),
     path('articles/<slug>/bookmark/',
-         views.BookMark.as_view(), name='article-bookmark'),
+         bookmark_view.BookMark.as_view(), name='article-bookmark'),
     path('articles/<slug>/report/',
-         views.ReportArticlesView.as_view(), name='report-article'),
+         report_view.ReportArticlesView.as_view(), name='report-article'),
     path('<slug>/comments/<int:id>/history/',
-         views.CommentHistory.as_view(),
+         comment_views.CommentHistory.as_view(),
          name='comment-history'),
     path('articles/<slug>/highlight/',
-         views.HighlightAPIView.as_view(), name='highlighttext'),
-    path('<slug>/share/email/', views.ShareArticleViaEmail.as_view(),
+         comment_views.HighlightAPIView.as_view(), name='highlighttext'),
+    path('<slug>/share/email/', share_view.ShareArticleViaEmail.as_view(),
          name="email_share_article"),
-    path('<slug>/share/facebook/', views.ShareArticleViaFacebook.as_view(),
+    path('<slug>/share/facebook/', share_view.ShareArticleViaFacebook.as_view(),
          name="facebook-share-article"),
-    path('<slug>/share/twitter/', views.ShareArticleViaTwitter.as_view(),
-         name="twitter-share-article"),
     path('statistics/',
-         views.ArticlesStatsView.as_view(), name='article-stats')
+         stats_view.ArticlesStatsView.as_view(), name='article-stats'),
+    path('<slug>/share/twitter/', share_view.ShareArticleViaTwitter.as_view(),
+         name="twitter-share-article")
+
 ]

@@ -22,8 +22,10 @@ class TestHighlight(TestBaseCase):
             slug), self.missing_highlight_field, format='json')
         response6 = self.client.post(self.highlight_url(
             "invalid slug"), self.highlight_data, format='json')
+        response7 = self.client.post(self.highlight_url(
+            slug), self.highlight_data, format='json')
         responses = [response1, response2, response3, response4,
-                     response5, response6]
+                     response5, response6, response7]
         return responses
 
     def base_error_messages(self, response, message):
@@ -69,3 +71,14 @@ class TestHighlight(TestBaseCase):
         message = "No article found for the slug given"
         response = self.highlight()[5]
         self._400_bad_request(response, message)
+
+    def test_same_comment_same_highlight(self):
+        """Test same user same comment same highlight"""
+        message1 = "You have posted same comment on this highlight before."
+        message2 = "Consider editting the comment or highlight"
+        message = message1+message2
+        response = self.highlight()[6]
+        self._400_bad_request(response, message)
+
+        
+
