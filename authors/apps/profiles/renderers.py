@@ -35,10 +35,10 @@ class FollowUnfollowJsonRenderer(BaseRenderer):
     def render(self, data, accepted_media_type=None, renderer_context=None):
         follow = data.get('follow-detail')
         if follow:
-            return json.dumps({'You are now following {}'.format(data['user']): data})
+            return json.dumps(data)
         unfollow = data.get('unfollow-detail')
         if unfollow:
-            return json.dumps({'You have successfuly unfollowed {}'.format(data['user']): data})
+            return json.dumps(data)
         errors = data.get('errors', None)
         if errors:
             return json.dumps({'Details': data})
@@ -57,10 +57,10 @@ class FollowingFollowrsJsonRenderer(BaseRenderer):
     def render(self, data, accepted_media_type=None, renderer_context=None):
         followers = data.get('followers-detail')
         if followers:
-            return json.dumps({'Here is a list of followers for {}'.format(data['user']): data})
+            return json.dumps(data)
         following = data.get('following-detail')
         if following:
-            return json.dumps({'Here is a list users following {}'.format(data['user']): data})
+            return json.dumps(data)
         errors = data.get('detail', None)
         if errors:
             return json.dumps({'Message': data})
