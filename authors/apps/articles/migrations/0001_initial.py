@@ -22,6 +22,7 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=1000)),
                 ('description', models.CharField(max_length=2000)),
                 ('body', models.TextField()),
+                ('views', models.IntegerField(default=0, null=True)),
                 ('image_url', models.URLField(blank=True, null=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),

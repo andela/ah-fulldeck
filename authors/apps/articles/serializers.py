@@ -37,6 +37,7 @@ class ArticleSerializers(serializers.ModelSerializer):
     avg_rating = serializers.SerializerMethodField(
         method_name='average_rating')
     tags = TagRelation(many=True, required=False)
+    views = serializers.IntegerField(read_only=True)
     author = serializers.SerializerMethodField(read_only=True)
 
     slug = serializers.CharField(read_only=True)
@@ -56,6 +57,7 @@ class ArticleSerializers(serializers.ModelSerializer):
             'slug',
             'avg_rating',
             'tags',
+            'views',
             'image_url',
             'author',
             'created_at',
@@ -106,7 +108,7 @@ class CommentsSerializers(serializers.ModelSerializer):
     def get_author(self, comment):
         author = ProfileSerializer(comment.author.username)
         return author
-       
+
     def format_date(self, date):
         return date.strftime('%d %b %Y %H:%M:%S')
 
@@ -218,3 +220,33 @@ class EmailCheckSerializer(serializers.Serializer):
             'invalid': 'Email must be of the format name@domain.com'
         }
     )
+class ArticleStatSerializer(serializers.ModelSerializer):
+    """
+    Serializer class for reading stats
+    """
+    view_count = serializers.SerializerMethodField()
+    comment_count = serializers.SerializerMethodField()
+    likes_count = serializers.SerializerMethodField()
+    dislikes_count = serializers.SerializerMethodField()
+    average_rating = serializers.SerializerMethodField()
+
+    def get_comment_count(self, value):
+        return Comment.objects.filter(article=value).count()
+
+    def get_view_count(self, value):
+        return value.views
+
+    def get_likes_count(self, value):
+        return LikeDislike.objects.likes().filter(article=value).count()
+
+    def get_dislikes_count(self, value):
+        return LikeDislike.objects.dislikes().filter(article=value).count()
+
+    def get_average_rating(self, value):
+        return ArticleRatings.objects.filter(article=value).aggregate(
+            average_rating=Avg('rating'))['average_rating'] or 0
+
+    class Meta:
+        model = Article
+        fields = ['slug', 'title', 'view_count', 'comment_count',
+                  'likes_count', 'dislikes_count', 'average_rating']

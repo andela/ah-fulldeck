@@ -1,3 +1,4 @@
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives
@@ -22,7 +23,7 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 from rest_framework.permissions import (IsAuthenticatedOrReadOnly,
-                                        IsAuthenticated)
+                                        IsAuthenticated, AllowAny)
 
 from collections import Counter
 from django.shortcuts import get_object_or_404
@@ -41,9 +42,9 @@ from .serializers import (ArticleSerializers,
                           RatingSerializer,
                           FavoriteArticlesSerializer,
                           CommentHistorySerializer,
-                          TagSerializer, ReportArticlesSerializer, EmailCheckSerializer)
+                          TagSerializer, ReportArticlesSerializer, EmailCheckSerializer, ArticleStatSerializer,)
 from authors.apps.helpers.send_email import send_email
-
+                          
 
 def article_not_found():
     raise ValidationError(
@@ -94,6 +95,9 @@ class RetrieveUpdateDeleteArticle(RetrieveUpdateDestroyAPIView):
         article = get_article(slug)
         if not article:
             article_not_found()
+        if request.user and not isinstance(request.user, AnonymousUser) and article.author != request.user:
+            article.views += 1
+            article.save()
         return super().get(request, slug)
 
     def update(self, request, slug):
@@ -645,3 +649,12 @@ class ShareArticleViaTwitter(CreateAPIView):
         url_link = twitter_url + article_link
         shared_post_url = {'link': url_link}
         return Response(shared_post_url, status=status.HTTP_200_OK)
+
+
+class ArticlesStatsView(ListAPIView):
+    serializer_class = ArticleStatSerializer
+    renderer_classes = (ArticleJsonRenderer,)
+    permission_classes = (AllowAny,)
+
+    def get_queryset(self):
+        return Article.objects.filter(author=self.request.user)
