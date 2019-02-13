@@ -109,16 +109,16 @@ DATABASES = {
 }
 
 SWAGGER_SETTINGS = {
-  'SHOW_REQUEST_HEADERS': True,
-  'USE_SESSION_AUTH': False,
-  'DOC_EXPANSION': 'list',
-  'SECURITY_DEFINITIONS': {
-      'api_key': {
-          'type': 'apiKey',
-          'in': 'header',
-          'name': 'Authorization'
-      }
-  }
+    'SHOW_REQUEST_HEADERS': True,
+    'USE_SESSION_AUTH': False,
+    'DOC_EXPANSION': 'list',
+    'SECURITY_DEFINITIONS': {
+        'api_key': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    }
 }
 
 # email configurations
@@ -172,10 +172,17 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
-CORS_ORIGIN_WHITELIST = (
-    '0.0.0.0:4000',
-    'localhost:4000',
+MIDDLEWARE_CLASSES = (
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.BrokenLinkEmailsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 )
+CORS_ORIGIN_ALLOW_ALL = True
+
+# CORS_ORIGIN_WHITELIST = (
+#     '0.0.0.0:4000',
+#     'localhost:4000',
+# )
 
 # Tell Django about the custom `User` model we created. The string
 # `authentication.User` tells Django we are referring to the `User` model in
@@ -193,6 +200,7 @@ REST_FRAMEWORK = {
 }
 
 django_heroku.settings(locals())
+
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.getenv('EMAIL_HOST')
@@ -233,3 +241,5 @@ SOCIAL_AUTH_PIPELINE = (
 )
 
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/articles'
+
+
