@@ -41,17 +41,18 @@ class RegistrationAPIView(CreateAPIView):
 
         email = serializer.data['email']
         username = serializer.data['username']
-        token = serializer.data['token']
         sender = os.getenv('EMAIL_SENDER')
-
-        current_site = get_current_site(request)
-        verification_link = "http://" + current_site.domain + \
-            '/api/v1/verify/{}'.format(token)
+        token = serializer.data['token']
+        verification_link = os.getenv(
+            'VERIFICATION_LINK').strip('\"').format(token)
+        print(verification_link)
         message_content = "Please verify that you requested to use this email address, \
             if you did not request this update, please ignore this \
             message."
-        email_data = [message_content, "VERIFY EMAIL ADDRESS", verification_link, username, '', '']
-        send_email("Authors Haven: Verification email", sender, email, email_data)
+        email_data = [message_content, "VERIFY EMAIL ADDRESS",
+                      verification_link, username, '', '']
+        send_email("Authors Haven: Verification email",
+                   sender, email, email_data)
         response_message = {
             "message": "User registered successfully. Check your mail for verification",
             "user_info": serializer.data
@@ -115,20 +116,20 @@ class PasswordResetAPIView(generics.CreateAPIView):
         recipient = request.data.get('email', {})  # user enters email
         if not recipient:
             return Response({"message": "Enter your email"}, status=status.HTTP_400_BAD_REQUEST)
-        # generate a new token for each email entered
         token = jwt.encode({"email": recipient},
                            settings.SECRET_KEY, algorithm='HS256')
+        # generate a new token for each email entered
         # confirm user exists
         user_exists = User.objects.filter(email=recipient).exists()
         if user_exists:
             subject = "Authors Haven: Password Reset"
             sender = os.getenv('EMAIL_SENDER')
-            host_url = get_current_site(request)
-            reset_link = "http://" + host_url.domain + \
-                '/api/v1/users/password_update/'+token.decode()
+            reset_link = os.getenv('VERIFICATION_LINK').strip(
+                '\"')+token.decode()
             message_content = "Please click the link below to reset your password"
             button_content = "RESET YOUR PASSWORD"
-            email_data = [message_content, button_content, reset_link, '', '', '']
+            email_data = [message_content,
+                          button_content, reset_link, '', '', '']
             send_email(subject, sender, recipient, email_data)
             result = {
                 'message': 'A password reset link has been sent to your email'
@@ -186,12 +187,12 @@ class SocialAuthView(CreateAPIView):
 
         # Load backend associated with the provider
         try:
-            
+
             backend = load_backend(
                 strategy=strategy, name=provider, redirect_uri=None)
             if isinstance(backend, BaseOAuth1):
                 if "access_token_secret" in request.data:
-                    access_token={
+                    access_token = {
                         'oauth_token': request.data['access_token'],
                         'oauth_token_secret': request.data['access_token_secret']
                     }
@@ -202,7 +203,7 @@ class SocialAuthView(CreateAPIView):
                     )
 
             elif isinstance(backend, BaseOAuth2):
-                
+
                 access_token = serializer.data.get("access_token")
 
         except MissingBackend:
@@ -212,7 +213,7 @@ class SocialAuthView(CreateAPIView):
         # Go through the pipeline to create user if they don't exist
         try:
             user = backend.do_auth(access_token, user=authenticated_user)
-        
+
         except BaseException:
             return Response({"error": "Invalid token"},
                             status=status.HTTP_400_BAD_REQUEST)
