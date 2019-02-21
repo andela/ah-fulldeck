@@ -80,6 +80,8 @@ class Article(models.Model):
     description = models.CharField(max_length=2000, blank=False)
     body = models.TextField(blank=False)
     tags = models.ManyToManyField('articles.Tag', related_name='articles')
+    likedislike = models.ManyToManyField(
+        'articles.LikeDislike', related_name='articles')
     views = models.IntegerField(null=True, default=0)
     image_url = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
