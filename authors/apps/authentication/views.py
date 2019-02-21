@@ -45,7 +45,6 @@ class RegistrationAPIView(CreateAPIView):
         token = serializer.data['token']
         verification_link = os.getenv(
             'VERIFICATION_LINK').strip('\"').format(token)
-        print(verification_link)
         message_content = "Please verify that you requested to use this email address, \
             if you did not request this update, please ignore this \
             message."

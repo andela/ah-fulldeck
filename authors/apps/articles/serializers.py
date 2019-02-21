@@ -36,6 +36,10 @@ class ArticleSerializers(serializers.ModelSerializer):
     )
     avg_rating = serializers.SerializerMethodField(
         method_name='average_rating')
+    likes = serializers.SerializerMethodField(
+        method_name='get_likes_count')
+    dislikes = serializers.SerializerMethodField(
+        method_name='get_dislikes_count')
     tags = TagRelation(many=True, required=False)
     views = serializers.IntegerField(read_only=True)
     author = serializers.SerializerMethodField(read_only=True)
@@ -61,7 +65,9 @@ class ArticleSerializers(serializers.ModelSerializer):
             'image_url',
             'author',
             'created_at',
-            'updated_at'
+            'updated_at',
+            'likes',
+            'dislikes'
         )
 
     def average_rating(self, instance):
@@ -72,12 +78,18 @@ class ArticleSerializers(serializers.ModelSerializer):
             article=instance).count()
         each_rating = Counter(ArticleRatings.objects.filter(
             article=instance).values_list('rating', flat=True))
-
+    
         return {
             'avg_rating': avg_rating,
             'total_user_rates': total_user_rates,
             'each_rating': each_rating
         }
+    
+    def get_likes_count(self, value):
+        return LikeDislike.objects.likes().filter(article=value).count()
+
+    def get_dislikes_count(self, value):
+        return LikeDislike.objects.dislikes().filter(article=value).count()
 
 
 class TagSerializer(serializers.ModelSerializer):
