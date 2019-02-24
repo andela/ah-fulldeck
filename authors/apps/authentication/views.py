@@ -135,8 +135,9 @@ class PasswordResetAPIView(generics.CreateAPIView):
             }
             return Response(result, status=status.HTTP_200_OK)
         else:  # If user does not exist
-            result = {
+            result = {"errors": {
                 'message': 'Ooopps, no user found with that email'
+                }
             }
             return Response(result, status=status.HTTP_404_NOT_FOUND)
 
