@@ -109,17 +109,23 @@ class CommentsSerializers(serializers.ModelSerializer):
             'required': 'Comments field cannot be blank'
         }
     )
-    author = serializers.SerializerMethodField()
+    author = serializers.SerializerMethodField(read_only=True)
+    author_image = serializers.SerializerMethodField(read_only=True)
     highlighted_text = serializers.CharField(read_only=True)
 
     class Meta:
         model = Comment
         fields = ('id', 'body', 'created_at', 'updated_at',
-                  'author', 'article', 'parent', 'highlighted_text')
+                  'author', 'article', 'parent', 'highlighted_text','author_image')
 
-    def get_author(self, comment):
-        author = ProfileSerializer(comment.author.username)
-        return author
+    def get_author(self, obj):
+        serializer = ProfileSerializer(
+            instance=Profile.objects.get(user=obj.author))
+        return serializer.data
+    def get_author_image(self, obj):
+        serializer = ProfileSerializer(
+            instance=Profile.objects.get(user=obj.author))
+        return serializer.data['image']
 
     def format_date(self, date):
         return date.strftime('%d %b %Y %H:%M:%S')
@@ -232,6 +238,8 @@ class EmailCheckSerializer(serializers.Serializer):
             'invalid': 'Email must be of the format name@domain.com'
         }
     )
+
+
 class ArticleStatSerializer(serializers.ModelSerializer):
     """
     Serializer class for reading stats

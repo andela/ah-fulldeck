@@ -9,7 +9,7 @@ from ..permissions import IsOwnerOrReadonly
 from ..models import Comment
 from ..serializers import (ArticleSerializers,
                            CommentsSerializers,
-                           CommentHistorySerializer)
+                           CommentHistorySerializer,ProfileSerializer)
 from ..utils import get_article
 
 
