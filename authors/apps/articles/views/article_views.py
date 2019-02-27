@@ -21,7 +21,8 @@ class ListCreateArticle(ListCreateAPIView):
     def get(self, request):
         paginator = StandardPagination()
         result_page = paginator.paginate_queryset(self.queryset, request)
-        serializer = ArticleSerializers(result_page, many=True)
+        serializer = ArticleSerializers(
+            result_page, context={'request': request}, many=True)
         return paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
@@ -64,7 +65,7 @@ class RetrieveUpdateDeleteArticle(RetrieveUpdateDestroyAPIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
         article_data = request.data.get('article', {})
         serializer = self.serializer_class(
-            article, data=article_data, partial=True)
+            article, data=article_data, context={'request': request}, partial=True)
         if serializer.is_valid():
             self.check_object_permissions(request, article)
             serializer.save()

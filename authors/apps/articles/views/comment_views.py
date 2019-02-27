@@ -170,7 +170,7 @@ class HighlightAPIView(CreateAPIView):
                 msg = "{} field cannot be empty".format(field)
                 return Response({"error": msg},
                                 status=status.HTTP_400_BAD_REQUEST)
-        serializer = self.serializer_class(article)
+        serializer = self.serializer_class(article, context={'request': request})
         start_index = request.data['start_index']
         end_index = request.data['end_index']
         article_body = serializer.data['body']
