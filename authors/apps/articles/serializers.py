@@ -6,6 +6,7 @@ from .models import (Article, Comment, LikeDislike,
                      ArticleRatings, Tag, FavoriteArticle, ReportArticle)
 from authors.apps.profiles.serializers import ProfileSerializer
 from authors.apps.profiles.models import Profile
+from django.contrib.auth.models import AnonymousUser
 from authors.apps.articles.relations import TagRelation
 
 
@@ -45,6 +46,7 @@ class ArticleSerializers(serializers.ModelSerializer):
     author = serializers.SerializerMethodField(read_only=True)
 
     slug = serializers.CharField(read_only=True)
+    bookmarked = serializers.SerializerMethodField()
 
     def get_author(self, obj):
         """This method gets the profile object for the article"""
@@ -67,7 +69,8 @@ class ArticleSerializers(serializers.ModelSerializer):
             'created_at',
             'updated_at',
             'likes',
-            'dislikes'
+            'dislikes',
+            'bookmarked'
         )
 
     def average_rating(self, instance):
@@ -78,13 +81,22 @@ class ArticleSerializers(serializers.ModelSerializer):
             article=instance).count()
         each_rating = Counter(ArticleRatings.objects.filter(
             article=instance).values_list('rating', flat=True))
-    
+
         return {
             'avg_rating': avg_rating,
             'total_user_rates': total_user_rates,
             'each_rating': each_rating
         }
-    
+
+    def get_bookmarked(self, article):
+        slug = article.slug
+        user = self.context.get('request').user
+        if not isinstance(user, AnonymousUser):
+            bookmarked = user.profile.bookmarks.filter(slug=slug).exists()
+        else:
+            bookmarked = False
+        return bookmarked
+
     def get_likes_count(self, value):
         return LikeDislike.objects.likes().filter(article=value).count()
 
@@ -122,6 +134,7 @@ class CommentsSerializers(serializers.ModelSerializer):
         serializer = ProfileSerializer(
             instance=Profile.objects.get(user=obj.author))
         return serializer.data
+
     def get_author_image(self, obj):
         serializer = ProfileSerializer(
             instance=Profile.objects.get(user=obj.author))
@@ -270,3 +283,4 @@ class ArticleStatSerializer(serializers.ModelSerializer):
         model = Article
         fields = ['slug', 'title', 'view_count', 'comment_count',
                   'likes_count', 'dislikes_count', 'average_rating']
+
