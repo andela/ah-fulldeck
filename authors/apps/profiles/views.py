@@ -114,7 +114,7 @@ class FollowUnfollow(CreateAPIView):
             followed_user, context={'request': request})
         data = {
             'message': 'You are now following {}'.format(username),
-            'follow-detail': serialize.data
+            'follow_detail': serialize.data
         }
         return Response(data, status=status.HTTP_201_CREATED)
 
@@ -167,7 +167,7 @@ class Following(RetrieveAPIView):
             following, many=True, context={'request': request})
         data = {
             'message': "List of authors {} is following".format(username),
-            'following-detail': serializer.data
+            'following_detail': serializer.data
         }
         return Response(data, status=status.HTTP_200_OK)
 
@@ -196,6 +196,6 @@ class FollowedBy(RetrieveAPIView):
             follower, many=True, context={'request': request})
         data = {
             'message': "List of authors following {}".format(username),
-            'followers-detail': serializer.data
+            'followers_detail': serializer.data
         }
         return Response(data, status=status.HTTP_200_OK)
