@@ -55,10 +55,10 @@ class FollowingFollowrsJsonRenderer(BaseRenderer):
     format = 'json'
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
-        followers = data.get('followers-detail')
+        followers = data.get('followers_detail')
         if followers:
             return json.dumps(data)
-        following = data.get('following-detail')
+        following = data.get('following_detail')
         if following:
             return json.dumps(data)
         errors = data.get('detail', None)
@@ -66,4 +66,4 @@ class FollowingFollowrsJsonRenderer(BaseRenderer):
             return json.dumps({'Message': data})
         if isinstance(data, dict):
             return json.dumps(
-                {'Response': data})
+                {'details': data})

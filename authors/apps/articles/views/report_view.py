@@ -55,9 +55,9 @@ class ReportArticlesView(ListCreateAPIView):
         recipient = os.getenv('EMAIL_RECIPIENT')
         subject = "Authors Haven: Reported article"
         sender = '{}'.format(request.user,)
-        host_url = get_current_site(request)
-        url = "http://" + host_url.domain + \
-            '/api/v1/articles/'+str(article.slug)+'/'
+        host_url = os.getenv('VERIFICATION_LINK')
+        url = "http://" + host_url+ \
+            '/article/'+str(article.slug)+'/'
         button_content = 'View reported article'
         email_message = render_to_string('report_article_template.html', {
             'link': url,
